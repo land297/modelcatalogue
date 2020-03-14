@@ -1,0 +1,87 @@
+﻿ var ptca = _ptse.Create(1, DbElementTypeInstance.PTCAR);
+            //doesn't compute number correct. should start at 10 and just add one...
+            int number = _ptse.Members().Count() + 10;
+            ptca.SetAttribute(DbAttributeInstance.NUMB, number);
+ 
+            //foreach(var att in ptca.GetAttributes()) {
+            //    Console.WriteLine($"{att.Name} - {att.Description} - {att.Type} - {att.Dimension.Description} - {att.Units.ToString()}");
+            //    if (att.Name=="PTCDI") {
+            //    }
+            //}
+            //try{
+            //    //Direction d = Direction.Create("X");
+            //    ptca.SetAttribute(DbAttributeInstance.PTCD, "X");
+            //    Console.WriteLine("ptcd true");
+            //}catch(Exception e) {
+            //    Console.WriteLine("ptcd false " + e.Message);
+            //}
+            var error = string.Empty;
+            //try {
+            //DbExpression.Parse("(X 45 Y)", out var exp, out var pdmserror);
+            //ptca.SetAttribute(DbAttributeInstance.PTCD, new DbQualifier(), exp, out pdmserror);
+            //}
+            //catch(Exception e) {
+            //    Console.WriteLine("dbexpression error: " + e.Message);
+            //}
+
+            //Console.WriteLine(ptca.GetAsString(DbAttributeInstance.PTCD));
+
+            if (!RunPMLCommand(ptca, "PTCDIR", directon, out error)) {
+                Console.WriteLine(error);
+            }
+            if (!RunPMLCommand(ptca, "PX", position[0], out error)) {
+                Console.WriteLine(error);
+            }
+            if (!RunPMLCommand(ptca, "PX", position[0], out error)) {
+                Console.WriteLine(error);
+            }
+            if (!RunPMLCommand(ptca, "PX", position[0], out error)) {
+                Console.WriteLine(error);
+            }
+            //SetDBExpression(ptca, directon, DbAttributeInstance.PTCD, out PdmsMessage pdmserror);
+            //SetDBExpression(ptca, position[1], DbAttributeInstance.PX, out var pdmserrorZ);
+
+            //if (!RunPMLCommand(ptca, "PX", position[1], out error)) {
+            //    Console.WriteLine(error);
+            //}
+            //if (!RunPMLCommand(ptca, "PX", position[2], out error)) {
+            //    Console.WriteLine(error);
+            //}
+            //Console.WriteLine(ptca.SetAttributeValue(DbAttributeInstance.PX, position[0]) ? $"setting {position[0]}" : $"not setting {position[0]}");
+            //ptca.SetAttribute(DbAttributeInstance.PY, position[1]);
+            //ptca.SetAttributeValue(DbAttributeInstance.PZ, position[2]);
+
+
+
+
+
+
+
+
+
+
+
+			     private bool RunPMLCommand(DbElement ce, string attribute, string command, out string error) {
+            CurrentElement.Element = ce;
+
+            //Command.CreateCommand(@"q name type").RunInPdms();
+
+            Command pmlCommand = Command.CreateCommand($"{attribute} {command}");
+            //Command pmlCommand = Command.CreateCommand("PTCDI X 20 Y");
+            var result = pmlCommand.RunInPdms();
+            //pmlCommand.RunInCurrentScope();
+            //pmlCommand.RunInCurrentScopeInPdms();
+            
+            //error is always empty string()
+            error = pmlCommand.Error.MessageText();
+
+            //var test1 = Environment.GetEnvironmentVariable("PDMsUSeR") + @"\sidpCommand.txt";
+            //Console.WriteLine(test1);
+            ////File.WriteAllText(test1, $@"{attribute} {command}");
+            //File.WriteAllText(test1, $@"PX 45");
+            //pmlCommand = Command.CreateCommand(@"$m %pdmsuser%\sidpCommand.txt");
+            //result = pmlCommand.Run();
+            ////error is always empty string()
+            //error = pmlCommand.Error.MessageText();
+            return result;
+        }

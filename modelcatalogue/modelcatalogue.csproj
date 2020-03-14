@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5F15DECC-9CDE-4DF0-AB03-9F5B7321BC87}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>modelcatalogue</RootNamespace>
+    <AssemblyName>modelcatalogue</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\..\..\Program Files %28x86%29\AVEVA\Everything3D2.10\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aveva.Core.Database">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Database.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aveva.Core.Database.Filters, Version=1.2.0.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Database.Filters.dll</HintPath>
+    </Reference>
+    <Reference Include="Aveva.Core.DataManagement">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.DataManagement.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aveva.Core.Geometry">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Geometry.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aveva.Core.Utilities">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Utilities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PMLNet">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\PMLNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AttributeInstance.cs" />
+    <Compile Include="Read\ConvertToBuildable\Box.cs" />
+    <Compile Include="Read\ConvertToBuildable\Cyli.cs" />
+    <Compile Include="Read\ConvertToBuildable\Nozz.cs" />
+    <Compile Include="Read\ConvertToBuildable\Convert.cs" />
+    <Compile Include="Read\ConvertToBuildable\Dish.cs" />
+    <Compile Include="Read\ConvertToBuildable\Ctor.cs" />
+    <Compile Include="Read\ConvertToBuildable\Extr.cs" />
+    <Compile Include="Read\ConvertToBuildable\IBuildableConverter.cs" />
+    <Compile Include="Read\ConvertToBuildable\Cone.cs" />
+    <Compile Include="Create\Builder.cs" />
+    <Compile Include="Create\Cata.cs" />
+    <Compile Include="Create\Cate.cs" />
+    <Compile Include="Create\CateModifier.cs" />
+    <Compile Include="Create\Geometry.cs" />
+    <Compile Include="Create\ICreator.cs" />
+    <Compile Include="Create\SpecManager.cs" />
+    <Compile Include="Create\SpcoFull.cs" />
+    <Compile Include="Create\Test1.cs" />
+    <Compile Include="Create\Text.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Buildable.cs" />
+    <Compile Include="ffscc.cs" />
+    <Compile Include="Create\Factory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Read\IReader.cs" />
+    <Compile Include="Read\Read.cs" />
+    <Compile Include="Read\Hierarchy.cs" />
+    <Compile Include="Read\Reader.cs" />
+    <Compile Include="UtilityStructures.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Create\oldPTSECode.txt" />
+    <Content Include="notes.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,7 @@
+﻿import 'modelcatalogue'
+handle(1000,0)
+endhandle
+using NameSpace 'modelcatalogue'
+
+!test = object ffscc()
+!test.execute()
