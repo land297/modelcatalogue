@@ -4,10 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace modelcatalogue {
-    class UtilityStructures {
-    }
 
-    //should make then inmutable
     public struct Size {
         public double XLength, YLength, ZLength, Diameter, Height, TopDiameter, BotDiameter;
     }

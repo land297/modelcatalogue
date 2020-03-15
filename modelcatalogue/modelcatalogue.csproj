@@ -94,7 +94,7 @@
     <Compile Include="Read\Read.cs" />
     <Compile Include="Read\Hierarchy.cs" />
     <Compile Include="Read\Reader.cs" />
-    <Compile Include="UtilityStructures.cs" />
+    <Compile Include="DimensionalStructs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Create\oldPTSECode.txt" />

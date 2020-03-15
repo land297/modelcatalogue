@@ -1,0 +1,27 @@
++ SITE
+	+ ZONE - Purp: AMTP, Valve group A
+		+ EQUI - Valve 1
+			+ (SUBE - optional)
+				+ (Primitives...)
+			+ NOZZ 1 - arrive size, connection, bolting
+			+ NOZZ 2 - leave size, connection, bolting
+			+ Primitives...
+		+ EQUI - Valve 2
+			+ (SUBE optional)
+				+ (Primitives...)
+			+ NOZZ 1 - arrive size, connection, bolting
+			+ NOZZ 2 - leave size, connection, bolting
+			+ Primitives...
+		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
+		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
+		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
+	+ ZONE - Purp: AMTP, (Valve group B)
+		+ EQUI - Valve size 1
+			+ (SUBE - optional)
+				+ (Primitives...)
+			+ NOZZ 1 - arrive size, connection, bolting
+			+ NOZZ 2 - leave size, connection, bolting
+			+ Primitives...
+		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
+		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
+		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
