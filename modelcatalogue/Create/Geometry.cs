@@ -8,10 +8,9 @@ using System.Text;
 
 namespace modelcatalogue.Create
 {
-    public class Geometry
-    {
-        private int _ppointCounter = 5;
-        private int _nozzlePppointCounter = 1;
+    public class Geometry {
+        private int _ppointCounter = 8;
+
         private DbElement _cate { get; set; }
         private DbElement _gmse { get; set; }
         private DbElement _ptse { get; set; }
@@ -29,7 +28,7 @@ namespace modelcatalogue.Create
             _createMapping.Add(DbElementTypeInstance.SDSH, SDSH);
             _createMapping.Add(DbElementTypeInstance.SCYLINDER, SCYL);
             _createMapping.Add(DbElementTypeInstance.LSNOUT, LSNO);
-            _createMapping.Add(DbElementTypeInstance.NOZZLE, ConnetingPPOINT);
+            _createMapping.Add(DbElementTypeInstance.NOZZLE, PPointForNozzle);
             _createMapping.Add(DbElementTypeInstance.SCTORUS, SCTO);
 
 
@@ -164,23 +163,44 @@ namespace modelcatalogue.Create
             RunPMLCommand(geom, "PAAXIS", $"-P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
             RunPMLCommand(geom, "PBAXIS", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
-        public void ConnetingPPOINT(Buildable element) {
-            if (_nozzlePppointCounter == 1) {
+        private int _nozzlePpointIndex = 0;
+        private int[] _validNozzlePpoints = new int[6] { 1, 2, 4, 5, 6, 7};
+        private List<int> _usedNozzlePpoints = new List<int>();
+        public void PPointForNozzle(Buildable element) {
+            _scom.SetAttribute(DbAttributeInstance.BLRF, element.NozzleConfig.Blrfarray);
+
+            //TODO: handle p3 for direction
+            if (!_usedNozzlePpoints.Contains(3)) {
                 var p = new Position();
                 p.X = 0;
                 p.Y = 0;
                 p.Z = 0;
                 ConnectingPTCA("Z", p, 0, 3, "");
+                _usedNozzlePpoints.Add(3);
             }
 
             Direction direction = element.Direction;
             Position position = element.Position;
             Size size = element.Size;
-            //TODO: handle which is 1 and 2
-            ConnectingPTCA(direction.Z, position, size.Diameter, _nozzlePppointCounter++, element.Coco);
-            //TODO: handle p3 for direction
-     
 
+            int ppoint = -1;
+            if (element.NozzleConfig.Ppoint == -1) {
+                if (_nozzlePpointIndex < _validNozzlePpoints.Length) {
+                    ppoint = _validNozzlePpoints[_nozzlePpointIndex++];
+                }
+            } else {
+                ppoint = element.NozzleConfig.Ppoint;
+            }
+            if (_usedNozzlePpoints.Contains(ppoint) || ppoint <= 0 || ppoint > _validNozzlePpoints.Last()) {
+
+                RunPMLCommand($"Invalid ppoint {ppoint} supplied for nozzle, will not create");
+                return;
+
+            } else {
+                _usedNozzlePpoints.Add(ppoint);
+            }
+
+            ConnectingPTCA(direction.Z, position, size.Diameter, ppoint , element.NozzleConfig.Coco);
         }
         public DbElement ConnectingPTCA(string direction, Position position, double size, int number, string coco) {
             var ptca = _ptse.Create(1, DbElementTypeInstance.PTCAR);
@@ -242,6 +262,17 @@ namespace modelcatalogue.Create
 
             var result = pmlCommand.RunInPdms();
             error = pmlCommand.Error.MessageText();
+            return result;
+        }
+        private bool RunPMLCommand(string command) {
+            if (command.Length == 0) {
+                return false;
+            }
+            Command pmlCommand;
+
+            pmlCommand = Command.CreateCommand(command);
+
+            var result = pmlCommand.RunInPdms();
             return result;
         }
     }

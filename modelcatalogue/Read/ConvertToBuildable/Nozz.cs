@@ -6,8 +6,7 @@ using System.Text;
 
 namespace modelcatalogue.ConvertToBuildable
 {
-    public class Nozz : IBuildableConverter
-    {
+    public class Nozz : IBuildableConverter {
         public DbElementType SourceType { get { return DbElementTypeInstance.NOZZLE; } }
         public Buildable Convert(DbElement element) {
             Size size = new Size();
@@ -17,9 +16,9 @@ namespace modelcatalogue.ConvertToBuildable
 
             var q = new DbQualifier();
             q.Add(1);
-
+            var nozzleConfig = new NozzleConfig();
             size.Diameter = element.GetDouble(DbAttributeInstance.PPBO, q);
-            var coco = element.GetString(DbAttributeInstance.PPCO, q);
+            nozzleConfig.Coco = element.GetString(DbAttributeInstance.PPCO, q);
             var pos = element.GetPosition(DbAttributeInstance.PPOS, q);
 
             position.X = pos.X;
@@ -37,14 +36,31 @@ namespace modelcatalogue.ConvertToBuildable
                 if (catref.GetValidRef(DbAttributeInstance.CATR, ref catrefOfCatref)) {
                     DbElement[] blrfarray = new DbElement[5];
                     if (catrefOfCatref.GetValidRefArray(DbAttributeInstance.BLRF, ref blrfarray)) {
-                        Console.WriteLine(blrfarray.Count());
+                        nozzleConfig.Blrfarray = blrfarray;
                     }
                 }
             }
 
+            var name = element.Name().ToUpper();
+            if (name.Contains("ARRIVE")) {
+                nozzleConfig.Ppoint = 1;
+            } else if (name.Contains("LEAVE")) {
+                nozzleConfig.Ppoint = 2;
+            } else if (name.Contains("P#")) {
+                if (int.TryParse(name.Split('#').Last(), out int p)) {
+                    nozzleConfig.Ppoint = p;
+                }
+            }
 
-            return new Buildable(DbElementTypeInstance.NOZZLE, element, size, position, direction,coco);
+
+                return new Buildable(DbElementTypeInstance.NOZZLE, element, size, position, direction, nozzleConfig);
 
         }
+    }
+
+    public class NozzleConfig {
+        public string Coco { get; set; }
+        public DbElement[] Blrfarray { get; set; }
+        public int Ppoint { get; set; } = -1;
     }
 }

@@ -1,10 +1,10 @@
 ﻿TODO:
 
-1) P3 is missing...
+
 2) BLRFARRAY is missing..
 
 
-
+a) Change TYPE, i.e. from VALV to FILT..not possible.
 
 import 'modelcatalogue'
 handle(1000,0)

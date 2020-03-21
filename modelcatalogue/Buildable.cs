@@ -1,4 +1,5 @@
 ﻿using Aveva.Core.Database;
+using modelcatalogue.ConvertToBuildable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,14 @@ namespace modelcatalogue {
         public Direction Direction { get; private set; }
         public Direction Direction2 { get; private set; }
         public List<Position> Verticies { get; private set; }
-        public string Coco { get; private set; }
+        public NozzleConfig NozzleConfig { get; private set; }
         public string ElementType { get { return _element.ElementType.ShortName; } }
-        public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction, string coco) {
+        public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction, ConvertToBuildable.NozzleConfig nozzleConfig) {
             _element = element;
             Size = size;
             Position = position;
             Direction = direction;
-            Coco = coco;
+            NozzleConfig = nozzleConfig;
             BuildAs = buildAs;
         }
         public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction) {

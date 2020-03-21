@@ -39,6 +39,26 @@ namespace modelcatalogue
         }
 
         [PMLNetCallable()]
+        public void Include(string equipmentName, string specNaem, string specTypeAnswer, string skey) {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            var builder = new Builder();
+            var spec = MDB.CurrentMDB.FindElement(DbType.Catalog, specNaem);
+            var equi = MDB.CurrentMDB.FindElement(DbType.Design, equipmentName);
+
+            builder.Cata = Cata.GetWritable(equi);
+            builder.Cate = new Cate();
+            builder.Reader = new Reader();
+            builder.Reader.Converter = new ConvertToBuildable.Convert();
+
+            var scom = builder.BuildScom(equi);
+
+            var spcoInfo = new Create.SpcoFull(scom, equi, specTypeAnswer,skey);
+            var specManager = new Create.SpecManager(spec,spcoInfo.FirstSeleTans);
+            specManager.AddSpco(spcoInfo);
+
+        }
+
+        [PMLNetCallable()]
         public void Include(string equipmentName, string specNaem) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
             var builder = new Builder();
@@ -99,7 +119,7 @@ namespace modelcatalogue
                  //   specManager.AddSpco(spcoInfo);
 
                 //} else {
-                    var specManager = new Create.SpecManager(spec);
+                    var specManager = new Create.SpecManager(spec,spcoInfo.FirstSeleTans);
                     specManager.AddSpco(spcoInfo);
                 //}
             //}

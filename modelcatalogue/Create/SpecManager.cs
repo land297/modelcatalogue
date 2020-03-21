@@ -19,18 +19,21 @@ namespace modelcatalogue.Create
          *                  spco ( answer to stype )
          *              sele
          */
-        public DbElement Spec { get; private set; }
 
-        public DbElement ValveSele { get {
+
+
+        public DbElement Spec { get; private set; }
+        
+        public DbElement FirstSele { get {
                 //valveSele must always exist
                 foreach (var sele in Spec.Members().Where(m => m.ElementType == DbElementTypeInstance.SELEC)) {
-                    if (sele.GetAsString(DbAttributeInstance.TANS) == "VALV") {
+                    if (sele.GetAsString(DbAttributeInstance.TANS) == FirstSeleTans) {
                         return sele;
                     }
                 }
 
                 var newSele = Spec.CreateLast(DbElementTypeInstance.SELEC);
-                newSele.SetAttribute(DbAttributeInstance.TANS, "VALV");
+                newSele.SetAttribute(DbAttributeInstance.TANS, FirstSeleTans);
                 newSele.SetAttribute(DbAttributeInstance.QUES, "PBOR");
                 newSele.SetAttribute(DbAttributeInstance.QUAL, 1);
 
@@ -41,12 +44,12 @@ namespace modelcatalogue.Create
 
         public DbElement BoreSele(double bore) {
 
-            Console.WriteLine(ValveSele.FullName() + " looking for boreSele with size: " + bore.ToString());
-            DbElement boreSele = ValveSele.Members().SingleOrDefault(m => m.GetDouble(DbAttributeInstance.ANSW) == bore);
+            Console.WriteLine(FirstSele.FullName() + " looking for boreSele with size: " + bore.ToString());
+            DbElement boreSele = FirstSele.Members().SingleOrDefault(m => m.GetDouble(DbAttributeInstance.ANSW) == bore);
 
             if (boreSele == null || boreSele.IsValid == false) {
                 Console.WriteLine("Adding new BORE SELE");
-                boreSele = ValveSele.CreateLast(DbElementTypeInstance.SELEC);
+                boreSele = FirstSele.CreateLast(DbElementTypeInstance.SELEC);
                 boreSele.SetAttribute(DbAttributeInstance.ANSW, bore);
                 boreSele.SetAttribute(DbAttributeInstance.MAXA, bore);
                 boreSele.SetAttribute(DbAttributeInstance.QUES, "SHOP");
@@ -59,23 +62,10 @@ namespace modelcatalogue.Create
             return boreSele.FirstMember();
             
         }
-        public SpecManager(DbElement spec) {
+        public string FirstSeleTans { get; private set; }
+        public SpecManager(DbElement spec, string firstSeleTans) {
             Spec = spec;
-        }
-
-        public SpecManager(DbElement specWld, string specName) {
-            Spec = specWld.Create(1, DbElementTypeInstance.SPECIFICATION);
-            Spec.SetAttribute(DbAttributeInstance.NAME, specName);
-            Spec.SetAttribute(DbAttributeInstance.QUES, "TYPE");
-            Spec.SetAttribute(DbAttributeInstance.PURP, "PIPE");
-
-            DbElement text = Spec.CreateLast(DbElementTypeInstance.TEXT);
-            text.SetAttribute(DbAttributeInstance.STEX, "PIPING");
-
-            DbElement valveSele = Spec.CreateLast(DbElementTypeInstance.SELEC);
-            valveSele.SetAttribute(DbAttributeInstance.TANS, "VALV");
-            valveSele.SetAttribute(DbAttributeInstance.QUES, "PBOR");
-
+            FirstSeleTans = firstSeleTans;
         }
 
         public void AddSpco(SpcoFull spcoInfo) {
