@@ -12,63 +12,19 @@ setup form !!modelspecplay resize
 	
 	button .buRefresh 'Refresh' at xmin ymax callback '!this.Refresh()'
 	container .conValeTypes PmlNetControl 'valvestypes' anchor left at xmin ymax width 40 height 14
-	
-	button .buAddNewType 'Add new type' at xmin.conValeTypes ymax.conValeTypes callback '!this.AddNewType()'
-	
-	--frame .f1  at xmin ymax+1
-			--text .texDetailText 'Description.' at xmin ymax width 20 is string
-			--text .texMaterialText 'Material' at xmin ymax width 20 is string
-			
+	--button .buAddNewType 'Add new type' at xmin.conValeTypes ymax.conValeTypes callback '!this.AddNewType()'
 	container .conValeTypeSizes PmlNetControl 'valvesizes' at xmin ymax width 40 height 14
-	
 	--exit
-	
 	container .conWritableSpecs PmlNetControl 'specs' anchor left at xmax.conValeTypes ymin.conValeTypes width 40 height 14
-	
-	text .texType 'Type' at xmin ymax + 1 width 20 is string
-	text .texSType 'SType' at xmin ymax width 20 is string
-	button .buIncludeDebug 'Include debug static' at xmin ymax callback '!this.IncludeSelectedDebug()'
+	--text .texType 'Type' at xmin ymax + 1 width 20 is string
+	--text .texSType 'SType' at xmin ymax width 20 is string
+	--button .buIncludeDebug 'Include debug static' at xmin ymax callback '!this.IncludeSelectedDebug()'
 	button .buIncludeInSpec 'Include selected sizes' at xmin ymax callback '!this.IncludeSelected()'
 	container .conValvesInWritableSpec PmlNetControl 'valvesinspecs' anchor left at xmin ymax width 40 height 14
-	
-	
-	
-
-	
-	
 	member .ValvesTypes is NetGridControl
 	member .ValveTypeSizes is NetGridControl
 	member .WritableSpecs is NetGridControl
 	member .ValvesInWritableSpec is NetGridControl
-	
-	--member .branchInlineItemsGrid is NetGridControl
-	
-	--member .activeGridName is string
-	-- member .activeGrid is NetGridControl
-	-- nenver mangaed to assign activeGrid = pipegrid or branchgrid to read as reference instead of now using name
-	-- very strange, but no time to ..
-	
-	--member .trackingGridSelection is boolean
-	--member .pipeSelectedElements is ARRAY
-	--member .branchGridSelectedElements is ARRAY
-	--member .branchConnectionsGridSelectedElements is ARRAY
-	--member .branchInlineItemsGridSelectedElements is ARRAY
-	
-	--member .pipeAttributes is ARRAY
-	--member .branchAttributes is ARRAY
-	
-	--member .branchGridAsIpaBranch is ARRAY
-	--member .branchConnectionsGridSelection is ARRAY
-	--member .branchInlineItemsGridSelection is ARRAY
-	--member .headings is ARRAY
-	--member .branchGridHeadings is ARRAY
-	--member .branchConnectionsGridHeadings is ARRAY
-	--member .branchInlineItemsGridHeadings is array
-	
-	--member .pathData is array
-	--member .pathIndex is real
-	
-	--member .eppp is EppPdms
 
 
 	menu .pipegridPopup popup
@@ -147,24 +103,34 @@ define method .modelspecplay()
 	--!this.eppp = object EppPdms()
 	!this.ValvesTypes= object NetGridControl() 
 	!this.conValeTypes.control = !this.ValvesTypes.handle()
-
+	!this.ValvesTypes.columnExcelFilter(false)
+	!this.ValvesTypes.bulkEditableGrid(false)
+	!this.ValvesTypes.outlookGroupStyle(false)
 	!this.ValvesTypes.addeventhandler('OnPopup', !this, 'rightClickGrid')
 	!this.ValvesTypes.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveTypes')
 
 	!this.ValveTypeSizes = object NetGridControl() 
 	!this.conValeTypeSizes.control = !this.ValveTypeSizes.handle()
-
+	!this.ValveTypeSizes.columnExcelFilter(false)
+	!this.ValveTypeSizes.bulkEditableGrid(false)
+	!this.ValveTypeSizes.outlookGroupStyle(false)
 	!this.ValveTypeSizes.addeventhandler('OnPopup', !this, 'branchrightClickGrid')
 	!this.ValveTypeSizes.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveTypeSizes')
 	
 	
 	!this.WritableSpecs= object NetGridControl() 
 	!this.conWritableSpecs.control = !this.WritableSpecs.handle()
+	!this.WritableSpecs.columnExcelFilter(false)
+	!this.WritableSpecs.bulkEditableGrid(false)
+	!this.WritableSpecs.outlookGroupStyle(false)
 	!this.WritableSpecs.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeWritableSpecs')
 	
 	!this.ValvesInWritableSpec= object NetGridControl() 
 	!this.conValvesInWritableSpec.control = !this.ValvesInWritableSpec.handle()
-
+	!this.ValvesInWritableSpec.columnExcelFilter(false)
+	!this.ValvesInWritableSpec.bulkEditableGrid(false)
+	!this.ValvesInWritableSpec.outlookGroupStyle(false)
+	
 	!this.formTitle = 'modelspecplay'
 	!this.cancelcall  = '!this.closecall()'
 
@@ -183,7 +149,7 @@ endmethod
 
 define method .Refresh()
 	!zones = !!CollectAllFor('ZONE','FUNC EQ |AMTP|',WORLD)	
-	q var !zones
+	--q var !zones
 	!this.ExtractAndBindValeTypesGrid(!zones)
 	
 	--q all spec wi unset(projid of dbref)
@@ -295,7 +261,7 @@ endmethod
 
 
 define method .afterSelectChangeValveTypes(!a is ARRAY)
-	q var !this.ValvesTypes.GETSELECTEDROWS()
+	--q var !this.ValvesTypes.GETSELECTEDROWS()
 	!branch = !this.ValvesTypes.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
@@ -303,7 +269,7 @@ define method .afterSelectChangeValveTypes(!a is ARRAY)
 		!this.ExtractAndBindValeTypesSizesGrid(!branch.dbref())
 	endhandle
 	
-	q var !a[0][1]
+	--q var !a[0][1]
 endmethod
 
 define method .ExtractAndBindValeTypesSizesGrid(!zone is dbref)
@@ -342,29 +308,29 @@ define method .ExtractAndBindValeTypesSizesGrid(!zone is dbref)
 endmethod
 
 define method .afterSelectChangeValveTypeSizes(!a is ARRAY)
-	$p afterSelectChangeValveTypeSizes
-	q var !this.ValveTypeSizes.GETSELECTEDROWS()
+	--$p afterSelectChangeValveTypeSizes
+	--q var !this.ValveTypeSizes.GETSELECTEDROWS()
 	!type = !this.ValveTypeSizes.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
 		--$!branch
 		--!this.ExtractAndBindValeTypesSizesGrid(!branch.dbref())
 	endhandle
-	q var !type
+	--q var !type
 	--!this.BindDataToBranchGrid(!branches)
 	--q var !a[0][1]
 	--!this.activeGridName = 'BRANCH' 	
 endmethod
 
 define method .afterSelectChangeWritableSpecs(!a is ARRAY)
-	q var !this.WritableSpecs.GETSELECTEDROWS()
+	--q var !this.WritableSpecs.GETSELECTEDROWS()
 	!spec = !this.WritableSpecs.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
 		--$!branch
 		!this.ExtractAndBindValesInWritableSpecGrid(!spec.dbref())
 	endhandle
-	q var !spec	
+	--q var !spec	
 endmethod
 
 define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
