@@ -3,15 +3,16 @@
 		+ EQUI - Valve 1
 			+ (SUBE - optional)
 				+ (Primitives...)
-			+ NOZZ 1 - arrive size, connection, bolting
-			+ NOZZ 2 - leave size, connection, bolting
+			+ NOZZ 1 - size*, connection type, bolting
+			+ NOZZ 2 - size*, connection type, bolting
 			+ Primitives...
 		+ EQUI - Valve 2
 			+ (SUBE optional)
 				+ (Primitives...)
-			+ NOZZ 1 - arrive size, connection, bolting
-			+ NOZZ 2 - leave size, connection, bolting
-			+ Primitives...
+			+ SUBE
+				+ NOZZ 1 - size*, connection type, bolting
+				+ NOZZ 2 - size*, connection type, bolting
+				+ Primitives...
 		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
 		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
 		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
@@ -19,9 +20,15 @@
 		+ EQUI - Valve size 1
 			+ (SUBE - optional)
 				+ (Primitives...)
-			+ NOZZ 1 - arrive size, connection, bolting
-			+ NOZZ 2 - leave size, connection, bolting
+			+ NOZZ 1 - size*, connection type, bolting
+			+ NOZZ 2 - size*, connection type, bolting
 			+ Primitives...
 		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
 		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
 		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
+		
+* Nozzles and arrive/leave
+1) If no action, first nozzle is arrive, second nozzle is leave
+2.a) If a nozzle has a name that contains string ARRIVE it will define the arrive size
+2.b) If a nozzle has a name that contains stirng LEAVE it will define the leave size
+3) If the nozzle has a name that ends in P#x, where x is  number 1,2,4,5,6,7 the nozzle will have that ppoint (1=arrive, 2 = leave)
