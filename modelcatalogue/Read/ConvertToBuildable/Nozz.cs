@@ -31,6 +31,17 @@ namespace modelcatalogue.ConvertToBuildable
             direction.Y = d.ToString();
             direction.Z = d.ToString();
 
+            var catref = DbElement.GetElement();
+            if (element.GetValidRef(DbAttributeInstance.CATR, ref catref)) {
+                var catrefOfCatref = DbElement.GetElement();
+                if (catref.GetValidRef(DbAttributeInstance.CATR, ref catrefOfCatref)) {
+                    DbElement[] blrfarray = new DbElement[5];
+                    if (catrefOfCatref.GetValidRefArray(DbAttributeInstance.BLRF, ref blrfarray)) {
+                        Console.WriteLine(blrfarray.Count());
+                    }
+                }
+            }
+
 
             return new Buildable(DbElementTypeInstance.NOZZLE, element, size, position, direction,coco);
 

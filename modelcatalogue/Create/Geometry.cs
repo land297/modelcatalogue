@@ -165,12 +165,6 @@ namespace modelcatalogue.Create
             RunPMLCommand(geom, "PBAXIS", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         public void ConnetingPPOINT(Buildable element) {
-            Direction direction = element.Direction;
-            Position position = element.Position;
-            Size size = element.Size;
-            //TODO: handle which is 1 and 2
-            ConnectingPTCA(direction.Z, position, size.Diameter, _nozzlePppointCounter++, element.Coco);
-            //TODO: handle p3 for direction
             if (_nozzlePppointCounter == 1) {
                 var p = new Position();
                 p.X = 0;
@@ -178,6 +172,14 @@ namespace modelcatalogue.Create
                 p.Z = 0;
                 ConnectingPTCA("Z", p, 0, 3, "");
             }
+
+            Direction direction = element.Direction;
+            Position position = element.Position;
+            Size size = element.Size;
+            //TODO: handle which is 1 and 2
+            ConnectingPTCA(direction.Z, position, size.Diameter, _nozzlePppointCounter++, element.Coco);
+            //TODO: handle p3 for direction
+     
 
         }
         public DbElement ConnectingPTCA(string direction, Position position, double size, int number, string coco) {
