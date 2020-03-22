@@ -8,19 +8,26 @@ endhandle
 
 setup form !!modelspecplay resize
 	using namespace 'Aveva.Core.Presentation'
-	using NameSpace 'cep_epp'	
-	
 	button .buRefresh 'Refresh' at xmin ymax callback '!this.Refresh()'
-	container .conValeTypes PmlNetControl 'valvestypes' anchor left at xmin ymax width 40 height 14
-	--button .buAddNewType 'Add new type' at xmin.conValeTypes ymax.conValeTypes callback '!this.AddNewType()'
-	container .conValeTypeSizes PmlNetControl 'valvesizes' at xmin ymax width 40 height 14
-	--exit
-	container .conWritableSpecs PmlNetControl 'specs' anchor left at xmax.conValeTypes ymin.conValeTypes width 40 height 14
-	--text .texType 'Type' at xmin ymax + 1 width 20 is string
-	--text .texSType 'SType' at xmin ymax width 20 is string
-	--button .buIncludeDebug 'Include debug static' at xmin ymax callback '!this.IncludeSelectedDebug()'
-	button .buIncludeInSpec 'Include selected sizes' at xmin ymax callback '!this.IncludeSelected()'
-	container .conValvesInWritableSpec PmlNetControl 'valvesinspecs' anchor left at xmin ymax width 40 height 14
+	frame .f1 'Found valve groups' anchor left at xmin ymax + 0.5
+		container .conValeTypes PmlNetControl 'valvestypes' width 45 height 14
+	exit
+	frame .f2 'Vales in group' at xmin ymax + 0.5
+		container .conValeTypeSizes PmlNetControl 'valvesizes' width 45 height 14
+	exit
+	frame .f3 'Writable specs' anchor left at xmax.f1 + 2 ymin.f1
+		container .conWritableSpecs PmlNetControl 'specs'  width 45 height 14
+	exit
+	frame .f4 'Valves in spec'at xmin ymax + 0.5
+		
+		container .conValvesInWritableSpec PmlNetControl 'valvesinspecs' width 45 height 14
+		
+	exit
+	button .buIncludeInSpec '> Include selected valves ' at xmin - 14 ymax.f2  callback '!this.IncludeSelected()'
+	
+	
+	
+	
 	member .ValvesTypes is NetGridControl
 	member .ValveTypeSizes is NetGridControl
 	member .WritableSpecs is NetGridControl
@@ -133,22 +140,12 @@ define method .modelspecplay()
 	
 	!this.formTitle = 'modelspecplay'
 	!this.cancelcall  = '!this.closecall()'
-
-	!this.texType.val = 'VALV'
-	!this.texSType.val = 'VAAA'
-	
-	--!this.trackingGridSelection = false
-  
-  	--!this.pipegrid.EDITABLEGRID(TRUE)
-	--!this.pipegrid.BulkEditableGrid(true)
-	
-	--!this.evapIpa = object evapIpa('')
 	
 	!this.Refresh()
 endmethod
 
 define method .Refresh()
-	!zones = !!CollectAllFor('ZONE','FUNC EQ |AMTP|',WORLD)	
+	!zones = !!CollectAllFor('ZONE','FUNC OF SITE EQ |AMTP|',WORLD)	
 	--q var !zones
 	!this.ExtractAndBindValeTypesGrid(!zones)
 	
@@ -163,21 +160,23 @@ define method .ExtractAndBindValeTypesGrid(!zones is array)
 	
 	!headings = Object Array()
 	!headings.Append('Name')
-	!headings.Append('Detail')
+	!headings.Append('Text')
 	!headings.Append('Material')
-	!headings.Append('skey')
+	!headings.Append('Skey')
+	!headings.Append('Stype')
 	
 	!rows = object array()
 	do !z values !zones
 		!dtxt = !!CollectAllFor('TEXT','PURP EQ |DTXT|',!z).first()
 		!mtxt = !!CollectAllFor('TEXT','PURP EQ |MTXT|',!z).first()
 		!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!z).first()
-		
+		!stype = !z.func
 		!row = object array()
 		!row.append(!z.name)
 		!row.append(!dtxt.stext)
 		!row.append(!mtxt.stext)
 		!row.append(!skey.stext)
+		!row.append(!stype)
 		!rows.append(!row)
 	enddo
 	
@@ -376,102 +375,4 @@ define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
 	!nds = object NetDataSource('x', !headings, !rows)
 	!this.ValvesInWritableSpec.BindToDataSource(!nds)
 
-endmethod
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-define method .BindDataToGrid(!elements is array)
-   using namespace  'Aveva.Core.Presentation'
-   !nds = object NetDataSource('pipe', !this.headings, !elements)
-   !this.branchGrid.BindToDataSource(!nds)
-   --!this.pipegrid.setcolumnwidth(3,140)
-endmethod
-
-define method .BindDataToBranchGrid(!elements is array)
---q var !this.headings
-	using namespace  'Aveva.Core.Presentation'
-	!nds = object NetDataSource('pipe', !this.headings, !elements)
-	!this.branchConnectionsGrid.BindToDataSource(!nds)
-	--!this.branchgrid.setcolumnwidth(3,140)
-endmethod
-
-define method .AddyyyData(!dbryyy is DBREF, !dataA is ARRAY)
-
-endmethod
-
-
-define method .OpenImport()
-	!nozzle = =23710/47403
-	!catref = !nozzle.catref.catref
-	
-	!gmse = !catref.gmref
-	!ptse = !catref.ptref
-	q var !gmse
-	do !geometry values !gmse.members
-		if !geometry.type eq 'SCYL' then
-			q var !geometry.pdistance
-			q var !geometry.pdiameter
-			q var !geometry.pheight
-			q var !geometry.paxis
-		endif
-	enddo
-	
-			Pdistance 0
-Pdiameter SUM PARAM 5 IPARAM 1
-Pheight DDHEIGHT
-Paxis X
-			
-			
-endmethod
-
-define method .SetGridColoursPerRowResult(!rRowIndex is REAL, !rStartIndex is REAL, !aResults is ARRAY)
-
-endmethod
-
-
-define method .SetAttributes(!object is DBREF, !rStartIndex is REAL, !aAttributes is ARRAY, !aHeadings is ARRAY) is ARRAY
-
-endmethod
-
-
-define method .changeSpecConfirm(!type is STRING, !element is string)
-   
-  
-endmethod
-
-
-define method .toggletrackGridSelection()
-	if !this.trackingGridSelection then
-		!this.trackingGridSelection = false
-	else	
-		!this.trackingGridSelection = true
-	endif
 endmethod
