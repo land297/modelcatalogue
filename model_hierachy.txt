@@ -1,5 +1,5 @@
-+ SITE
-	+ ZONE - Purp: AMTP, Valve group A
++ SITE - Func: AMTP
+	+ ZONE - Valve group A, Func: Stype of valve in spec, i.e. HLVE
 		+ EQUI - Valve 1
 			+ (SUBE - optional)
 				+ (Primitives...)
@@ -16,16 +16,14 @@
 		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
 		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
 		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
-	+ ZONE - Purp: AMTP, (Valve group B)
-		+ EQUI - Valve size 1
-			+ (SUBE - optional)
-				+ (Primitives...)
-			+ NOZZ 1 - size*, connection type, bolting
-			+ NOZZ 2 - size*, connection type, bolting
+	+ ZONE - Valve group B, Func HWHE
+		+ EQUI - Valve 2
+			+ NOZZ 1 
+			+ NOZZ 2 
 			+ Primitives...
-		+ TEXT 1 - Purp: DTXT, Stext: Detail text on isometric
-		+ TEXT 2 - Purp: MTXT, Stext: Material text on isometric
-		+ TEXT 3 - Purp: SKEY, Stext: Symbol on isometric
+		+ TEXT 1
+		+ TEXT 2
+		+ TEXT 3
 		
 * Nozzles and arrive/leave
 1) If no action, first nozzle is arrive, second nozzle is leave
