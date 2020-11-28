@@ -34,18 +34,21 @@ namespace modelcatalogue.Create
             foreach (DbElement ptca in ptcas) {
                 if (ptca.GetAsString(DbAttributeInstance.NUMB) == "1") {
                     var t = ptca.GetAsString(DbAttributeInstance.PBOR);
-                    PBore1 = double.Parse(t);
                     t = t.Replace("(", string.Empty);
                     t = t.Replace("'", string.Empty);
+                    t = t.Replace(")", string.Empty);
+                    PBore1 = double.Parse(t);
 
                 } else if (ptca.GetAsString(DbAttributeInstance.NUMB) == "2") {
                     var t = ptca.GetAsString(DbAttributeInstance.PBOR);
                     t = t.Replace("(", string.Empty);
                     t = t.Replace("'", string.Empty);
+                    t = t.Replace(")", string.Empty);
                     PBore2 = double.Parse(t);
                 }
             }
 
+            //TODO: replace function
             var purp = _equipment.Owner.GetString(DbAttributeInstance.PURP);
             if (purp.Length < 4) {
                 FirstSeleTans = "VALV";

@@ -46,6 +46,7 @@ namespace modelcatalogue.Create
             var ptcaX = PTCA(element.Direction.X, element.Position);
             var ptcaY = PTCA(element.Direction.Y, element.Position);
             //var ptcaZ = PTCA(element.Direction.Z, element.Position);
+
             var geom = _gmse.Create(1, DbElementTypeInstance.SEXTRUSION);
 
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
@@ -55,17 +56,17 @@ namespace modelcatalogue.Create
             RunPMLCommand(geom, "PBAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
             RunPMLCommand(geom, "PHEI", element.Size.Height.ToString(), out error);
 
-            RunPMLCommand(geom, "PX", element.Position.X.ToString(), out error);
-            RunPMLCommand(geom, "PY", element.Position.Y.ToString(), out error);
-            RunPMLCommand(geom, "PZ", element.Position.Z.ToString(), out error);
+            // no need to set position, as position is set by PAAX and PBAX
+            //RunPMLCommandInParentheses(geom, "PX", element.Position.X.ToString(), out error);
+            //RunPMLCommandInParentheses(geom, "PY", element.Position.Y.ToString(), out error);
+            //RunPMLCommandInParentheses(geom, "PZ", element.Position.Z.ToString(), out error);
 
             var sloo = geom.Create(1, DbElementTypeInstance.SLOOP);
 
             foreach (var vert in element.Verticies) {
                 var svert = sloo.CreateLast(DbElementTypeInstance.SVERTEX);
-                RunPMLCommand(svert, "PX", vert.X.ToString(), out error);
-                RunPMLCommand(svert, "PY", vert.Y.ToString(), out error);
-
+                RunPMLCommandInParentheses(svert, "PX", vert.X.ToString(), out error);
+                RunPMLCommandInParentheses(svert, "PY", vert.Y.ToString(), out error);
             }
 
         }
@@ -220,7 +221,7 @@ namespace modelcatalogue.Create
         }
         public DbElement PTCA(string direction, Position position) {
             var error = string.Empty;
-            //TODO: check if PTCA with direction and position already exisits!
+            
             foreach (DbElement p in new DBElementCollection(_ptse, new TypeFilter(DbElementTypeInstance.PTCAR))) {
                 var pDir = p.GetAsString(DbAttributeInstance.PTCD);
                 var pX = p.GetString(DbAttributeInstance.PX).Clean();
