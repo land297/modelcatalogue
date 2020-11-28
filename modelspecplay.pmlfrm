@@ -2,128 +2,75 @@ import 'GridControl'
 handle any
 endhandle
 
-import 'cep_epp'
-handle(1000,0)
-endhandle
-
 setup form !!modelspecplay resize
 	using namespace 'Aveva.Core.Presentation'
-	button .buRefresh 'Refresh' at xmin ymax callback '!this.Refresh()'
-	frame .f1 'Found valve groups' anchor left at xmin ymax + 0.5
-		container .conValeTypes PmlNetControl 'valvestypes' width 45 height 14
+	
+	frame .tabset TABSET '' anchor all
+		frame .framOverview 'Overview' dock fill
+			button .buRefresh 'Refresh' at xmin ymax callback '!this.Refresh()'
+			
+			frame .f1 'Found valve groups' anchor left at xmin ymax + 0.5
+				container .conValveTypesGrid PmlNetControl 'valvestypes' width 45 height 14
+			exit
+			frame .f2 'Vales in group' at xmin ymax + 0.5
+				container .conValveSizesGrid PmlNetControl 'valvesizes' width 45 height 14
+			exit
+			frame .f3 'Writable specs' anchor left at xmax.f1 + 2 ymin.f1
+				container .conWritableSpecs PmlNetControl 'specs'  width 45 height 14
+			exit
+			frame .f4 'Valves in spec'at xmin ymax + 0.5
+				container .conValvesInWritableSpec PmlNetControl 'valvesinspecs' width 45 height 14
+			exit
+			
+			button .buIncludeInSpec '> Include selected valves ' at xmin - 14 ymax.f2  callback '!this.IncludeSelected()'
+		exit
+		frame .framBuild 'Create/Modify Group' dock fill
+			button .buCMSelect 'Select/Create Group(Zone)' at xmin ymax + 0.5 callback '!this.CMSelectCreate()'
+			text .textCreateCe  tagwid 3 ''  at xmax + 0.5 ymin width 15 is string
+			
+			
+			text .textDetailText  tagwid 8 'Detail text'  at xmin.buCMSelect ymax.buCMSelect + 1 width 15 is string
+			text .textMaterial  tagwid 8 'Material'  at xmin ymax + 0.5 width 15 is string
+			text .textSkey  tagwid 8 'Skey'  at xmin ymax + 0.5 width 5 is string
+			text .textStype  tagwid 8 'Stype'  at xmin ymax + 0.5 width 5 is string
+			button .buCMModify 'Modify' at xmin ymax + 0.5 callback '!this.CMModify()'
+		exit
 	exit
-	frame .f2 'Vales in group' at xmin ymax + 0.5
-		container .conValeTypeSizes PmlNetControl 'valvesizes' width 45 height 14
-	exit
-	frame .f3 'Writable specs' anchor left at xmax.f1 + 2 ymin.f1
-		container .conWritableSpecs PmlNetControl 'specs'  width 45 height 14
-	exit
-	frame .f4 'Valves in spec'at xmin ymax + 0.5
 		
-		container .conValvesInWritableSpec PmlNetControl 'valvesinspecs' width 45 height 14
-		
-	exit
-	button .buIncludeInSpec '> Include selected valves ' at xmin - 14 ymax.f2  callback '!this.IncludeSelected()'
-	
-	
-	
-	
-	member .ValvesTypes is NetGridControl
+	member .ValveTypesGrid is NetGridControl
 	member .ValveTypeSizes is NetGridControl
 	member .WritableSpecs is NetGridControl
 	member .ValvesInWritableSpec is NetGridControl
 
-
-	menu .pipegridPopup popup
-		--!this.pipegridPopup.add( 'CALLBACK', 'Delete rows', '!this.DeleteRow()' ) 
-		!this.pipegridPopup.add( 'MENU', 'Set insulation', 'insulationMenu' )
-		!this.pipegridPopup.add( 'MENU', 'Set purpose', 'pipepurposeMenu' )
-		!this.pipegridPopup.add( 'MENU', 'Set insulation type UDA', 'pipeinsuTypeMenu' )
-		!this.pipegridPopup.add( 'MENU', 'Set insulation spec UDA', 'pipeinsuSpecMenu' )
-		--!this.pipegridPopup.add( 'Toggle' ,'Active/Inactive', '!this.toggle(', 'OnOff' )
-		--!this.pipepipegridPopup.add( 'CALLBACK', 'Save to Excel...', '!this.saveToExcel()' )
-		--!this.pipepipegridPopup.add( 'CALLBACK', 'Import Data from Excel...', '!this.loadFromExcel()' )
+	menu .menuValveTypes popup
+		!this.menuValveTypes.add( 'callback', 'Select', '!this.Select()' )
 		
-	menu .insulationMenu popup
-		!this.insulationMenu.add( 'callback', 'No insulation', '!this.SetInsulation(||)' )
-	
-	menu .pipepurposeMenu popup
-	--!this.pipepurposeMenu.add( 'callback', 'Unset', '!this.SetAttribute(|Purpose;UNSET|)' )
-
-	menu .pipeinsuTypeMenu popup
-	--!this.pipeinsuTypeMenu.add( 'callback', 'Unset', '!this.SetInsulation(||)' )
-	
-	menu .pipeinsuSpecMenu popup
-	--!this.pipeinsuSpecMenu.add( 'callback', 'Unset', '!this.SetInsulation(||)' )
-  
-  	menu .branchConnectionsGridPopup popup
-		--!this.branchConnectionsGridPopup.add( 'CALLBACK', 'Delete rows', '!this.DeleteRow()' ) 
-		!this.branchConnectionsGridPopup.add( 'CALLBACK', 'Commit', '!this.Connect(||)' )
-		--!this.branchConnectionsGridPopup.add( 'MENU', 'Set purpose', 'pipepurposeMenu' )
-		--!this.branchConnectionsGridPopup.add( 'CALLBACK', 'Connect tail', '!this.Connect(|TAIl|)' )
-		--!this.branchConnectionsGridPopup.add( 'CALLBACK', 'Create off branch', '!this.CreateBranch(||)' )
-		--!this.branchConnectionsGridPopup.add( 'MENU', 'Set insulation spec UDA', 'branchinsuSpecMenu' )
-		--!this.branchConnectionsGridPopup.add( 'MENU', 'Set electric insulation UDA', 'branchelecinsuSpecMenu' )
-		--!this.branchConnectionsGridPopup.add( 'Toggle' ,'Active/Inactive', '!this.toggle(', 'OnOff' )
-	  
-	menu .branchInlineItemsGridPopup popup
-		--!this.branchInlineItemsGridPopup.add( 'CALLBACK', 'Delete rows', '!this.DeleteRow()' ) 
-		!this.branchInlineItemsGridPopup.add( 'CALLBACK', 'Create inline', '!this.CreateInline(||)' )
 		
-	menu .branchinsuTypeMenu popup
-	
-	menu .branchinsuSpecMenu popup
-	
-	menu .branchelecinsuSpecMenu popup
-
-
-	--button .button1 'Add Pipes' at 0 0 width 10 height 1 callback '!this.AddPipes(!!CE)'
+	menu .menuValveSizes popup
+		!this.menuValveSizes.add( 'callback', 'Add + Select', '!this.AddSelect()' )
 	
 	
-	--button .button2 'Load path for branch' callback '!this.LoadPathForBranch()'
-	--button .button3 'Draw next path for branch' callback '!this.DrawNextPath()'
-	
-	--toggle .useOriginalStart 'Original Start' at xmin.button2 ymax.button2
-	--text .text1 'Compare Mill ID:.' at xmin ymax width 50 is string
-	--text .text2 'PathIndex:' at xmin ymax width 50 is string
-	--toggle .ttoggletrackGridSelection 'Track grid selection' at xmax.button1+0.2 ymin call '!this.toggletrackGridSelection()'
-	--button .button2 'Save to Excel' at xmax ymin width 10 height 1 callback '!this.SaveToXls()'
-	--button .button3 'Import from Excel' at xmax ymin width 15 height 1 callback '!this.OpenImport()'
-	--button .button4 'Reset' at xmax ymin width 15 height 1 callback '!this.Reset()'
-
-	--container .pipepipeGridFrame PmlNetControl 'grid' dock fill width 30 height 20
-	
-	--container .branchConnectionsGridFrame PmlNetControl 'branchconnectiongrid' anchor right at xmax.branchGridFrame ymin width 40 height 20
-
-	
-	!this.externalcall = '!!evapIpaUI.extevent('	
 exit
 
-define method .extevent(!dummy is REAL, !command is STRING)
-     -- !command is the string sent from the external application
-     $!command
-endmethod
 
 define method .modelspecplay()
 	using namespace 'Aveva.Core.Presentation'
-	--using NameSpace 'cep_epp'
-	--!this.eppp = object EppPdms()
-	!this.ValvesTypes= object NetGridControl() 
-	!this.conValeTypes.control = !this.ValvesTypes.handle()
-	!this.ValvesTypes.columnExcelFilter(false)
-	!this.ValvesTypes.bulkEditableGrid(false)
-	!this.ValvesTypes.outlookGroupStyle(false)
-	!this.ValvesTypes.addeventhandler('OnPopup', !this, 'rightClickGrid')
-	!this.ValvesTypes.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveTypes')
+
+	!this.ValveTypesGrid= object NetGridControl() 
+	!this.conValveTypesGrid.control = !this.ValveTypesGrid.handle()
+	!this.ValveTypesGrid.columnExcelFilter(false)
+	!this.ValveTypesGrid.bulkEditableGrid(false)
+	!this.ValveTypesGrid.outlookGroupStyle(false)
+	!this.ValveTypesGrid.addeventhandler('OnPopup', !this, 'valveTypesOnPopup')
+	!this.ValveTypesGrid.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveTypes')
 
 	!this.ValveTypeSizes = object NetGridControl() 
-	!this.conValeTypeSizes.control = !this.ValveTypeSizes.handle()
+	!this.conValveSizesGrid.control = !this.ValveTypeSizes.handle()
 	!this.ValveTypeSizes.columnExcelFilter(false)
 	!this.ValveTypeSizes.bulkEditableGrid(false)
 	!this.ValveTypeSizes.outlookGroupStyle(false)
-	!this.ValveTypeSizes.addeventhandler('OnPopup', !this, 'branchrightClickGrid')
-	!this.ValveTypeSizes.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveTypeSizes')
-	
+	!this.ValveTypeSizes.addeventhandler('OnPopup', !this, 'valveSizesOnPopup')
+	!this.ValveTypeSizes.addeventhandler('AfterSelectChange', !this, 'afterSelectChangeValveSizes')
 	
 	!this.WritableSpecs= object NetGridControl() 
 	!this.conWritableSpecs.control = !this.WritableSpecs.handle()
@@ -146,12 +93,8 @@ endmethod
 
 define method .Refresh()
 	!zones = !!CollectAllFor('ZONE','FUNC OF SITE EQ |AMTP|',WORLD)	
-	--q var !zones
 	!this.ExtractAndBindValeTypesGrid(!zones)
-	
-	--q all spec wi unset(projid of dbref)
 	!specs = !!CollectAllFor('SPEC','UNSET(PROJID OF DBREF)',WORLD)	
-	--q var !specs
 	!this.ExtractAndSpecsGrid(!specs)		
 endmethod
 
@@ -181,7 +124,7 @@ define method .ExtractAndBindValeTypesGrid(!zones is array)
 	enddo
 	
 	!nds = object NetDataSource('branch', !headings, !rows)
-	!this.ValvesTypes.BindToDataSource(!nds)
+	!this.ValveTypesGrid.BindToDataSource(!nds)
 endmethod
 define method .ExtractAndSpecsGrid(!specs is array)
 	using namespace 'Aveva.Core.Presentation'
@@ -226,42 +169,37 @@ define method .IncludeSelected()
 	-- create scom
 	!test = object ffscc()
 	!spec = !this.WritableSpecs.GETSELECTEDROWS()[1][1]
-	--q var !this.ValveTypeSizes.GETSELECTEDROWS()
 	do !selected values !this.ValveTypeSizes.GETSELECTEDROWS()
 		!name = !selected[1]
-		
 		!test.Include(!name, !spec)
 	enddo
-
 endmethod
 
-    
-define method .rightClickGrid(!data is ARRAY)
-  !this.pipeGridFrame.popup = !this.pipegridPopup
-  --!this.selectedElementsA = !data[2]
-  !this.pipeGridFrame.showPopup(!data[0], !data[1])
-  !this.activeGridName ='PIPE'
-  ----q var  !data[2]
+define method .valveTypesOnPopup(!data is ARRAY)
+  !this.conValveTypesGrid.popup = !this.menuValveTypes
+  !this.conValveTypesGrid.showPopup(!data[0], !data[1])
 endmethod
-define method .branchrightClickGrid(!data is ARRAY)
-  !this.branchConnectionsGridFrame.popup = !this.branchConnectionsGridPopup
-  --!this.selectedElementsA = !data[2]
-  !this.branchConnectionsGridFrame.showPopup(!data[0], !data[1])
-  !this.activeGridName ='BRANCH'
-  ----q var  !data[2]
+
+define method .valveSizesOnPopup(!data is ARRAY)
+  !this.conValveSizesGrid.popup = !this.menuValveSizes
+  !this.conValveSizesGrid.showPopup(!data[0], !data[1])
 endmethod
-define method .branchInlinerightClickGrid(!data is ARRAY)
-  !this.branchInlineItemsGridFrame.popup = !this.branchInlineItemsGridPopup
-  --!this.selectedElementsA = !data[2]
-  !this.branchInlineItemsGridFrame.showPopup(!data[0], !data[1])
-  !this.activeGridName ='BRANCH'
-  ----q var  !data[2]
+
+define method .select() 
+	!valveType = !this.ValveTypesGrid.GetSelectedRows()[1][1]
+	$!valveType
+endmethod
+
+define method .AddSelect()
+	!valveType = !this.ValveTypeSizes.GetSelectedRows()[1][1]
+	ADD $!valveType
+	$!valveType
 endmethod
 
 
 define method .afterSelectChangeValveTypes(!a is ARRAY)
-	--q var !this.ValvesTypes.GETSELECTEDROWS()
-	!branch = !this.ValvesTypes.GETSELECTEDROWS()[1][1]
+	--q var !this.ValveTypesGrid.GETSELECTEDROWS()
+	!branch = !this.ValveTypesGrid.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
 		--$!branch
@@ -306,30 +244,19 @@ define method .ExtractAndBindValeTypesSizesGrid(!zone is dbref)
 	!this.ValveTypeSizes.BindToDataSource(!nds)
 endmethod
 
-define method .afterSelectChangeValveTypeSizes(!a is ARRAY)
-	--$p afterSelectChangeValveTypeSizes
-	--q var !this.ValveTypeSizes.GETSELECTEDROWS()
+define method .afterSelectChangeValveSizes(!a is ARRAY)
 	!type = !this.ValveTypeSizes.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
-		--$!branch
-		--!this.ExtractAndBindValeTypesSizesGrid(!branch.dbref())
 	endhandle
-	--q var !type
-	--!this.BindDataToBranchGrid(!branches)
-	--q var !a[0][1]
-	--!this.activeGridName = 'BRANCH' 	
 endmethod
 
 define method .afterSelectChangeWritableSpecs(!a is ARRAY)
-	--q var !this.WritableSpecs.GETSELECTEDROWS()
 	!spec = !this.WritableSpecs.GETSELECTEDROWS()[1][1]
 	handle any
 	elsehandle none
-		--$!branch
 		!this.ExtractAndBindValesInWritableSpecGrid(!spec.dbref())
 	endhandle
-	--q var !spec	
 endmethod
 
 define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
@@ -375,4 +302,99 @@ define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
 	!nds = object NetDataSource('x', !headings, !rows)
 	!this.ValvesInWritableSpec.BindToDataSource(!nds)
 
+endmethod
+
+
+define method .CMSelectCreate()
+	!cex = !!ce
+	ZONE
+	handle any
+	endhandle
+	
+	!ce = !!ce
+	if !ce.type eq 'ZONE' and !ce.owner.func.eqNoCase('AMTP') then
+		!this.LoadGroup(!ce)
+	elseif !ce.type eq 'SITE' and !ce.func.eqNoCase('AMTP') then
+		!this.CreateGroup(!ce)	
+	endif
+	
+	!!ce = !cex
+endmethod
+define method .CMModify()
+	!zone = !this.textCreateCe.val.dbref()
+	handle any
+		!!Alert.Warning('Invalid name of group')
+		return
+	endhandle
+	
+	!dtxt = !!CollectAllFor('TEXT','PURP EQ |DTXT|',!zone).first()
+	handle any
+		$!zone
+		NEW TEXT PURP DTXT
+		!dtxt = !!ce
+	endhandle
+	!mtxt = !!CollectAllFor('TEXT','PURP EQ |MTXT|',!zone).first()
+	handle any
+		$!zone
+		NEW TEXT PURP MTXT
+		!mtx = !!ce
+	endhandle
+	!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!zone).first()
+	handle any
+		$!zone
+		NEW TEXT PURP SKEY
+		!skey = !!ce
+	endhandle
+	
+	!dtxt.stext = !this.textDetailText.val
+	!mtxt.stext = !this.textMaterial.val
+	!skey.stext = !this.textSkey.val
+	!zone.func = !this.textStype.val
+endmethod
+define method .LoadGroup(!zone is dbref)
+	!this.textCreateCe.val = !zone.name
+	
+	!dtxt = !!CollectAllFor('TEXT','PURP EQ |DTXT|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP DTXT
+		!dtxt = ''
+	endhandle
+	!mtxt = !!CollectAllFor('TEXT','PURP EQ |MTXT|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP MTXT
+		!mtxt = ''
+	endhandle
+	!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP SKEY
+		!skey = ''
+	endhandle
+	!stype = !zone.func
+	
+	!this.textDetailText.val = !dtxt
+	!this.textMaterial.val = !mtxt
+	!this.textSkey.val = !skey
+	!this.textStype.val = !stype
+endmethod
+
+define method .CreateGroup(!site is dbref)
+	$!site
+	NEW ZONE
+	!name = !this.textCreateCe.val
+	if !name.substring(1,1) ne '/' then
+		!name = '/' + !name
+	endif
+	NAME $!name
+	handle any
+		!!Alert.Error(!name + ' is not a valid name')
+		DELETE ZONE
+		return
+	endhandle
+	
+	!zone = !!ce
+	!this.LoadGroup(!zone)
+	
 endmethod
