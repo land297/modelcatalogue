@@ -52,21 +52,21 @@ namespace modelcatalogue.Create
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
             var error = string.Empty;
 
-            RunPMLCommand(geom, "PAAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(geom, "PBAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(geom, "PHEI", element.Size.Height.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PAAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PBAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PHEI", element.Size.Height.ToString(), out error);
 
             // no need to set position, as position is set by PAAX and PBAX
-            //RunPMLCommandInParentheses(geom, "PX", element.Position.X.ToString(), out error);
-            //RunPMLCommandInParentheses(geom, "PY", element.Position.Y.ToString(), out error);
-            //RunPMLCommandInParentheses(geom, "PZ", element.Position.Z.ToString(), out error);
+            //PMLCommander.RunPMLCommandInParentheses(geom, "PX", element.Position.X.ToString(), out error);
+            //PMLCommander.RunPMLCommandInParentheses(geom, "PY", element.Position.Y.ToString(), out error);
+            //PMLCommander.RunPMLCommandInParentheses(geom, "PZ", element.Position.Z.ToString(), out error);
 
             var sloo = geom.Create(1, DbElementTypeInstance.SLOOP);
 
             foreach (var vert in element.Verticies) {
                 var svert = sloo.CreateLast(DbElementTypeInstance.SVERTEX);
-                RunPMLCommandInParentheses(svert, "PX", vert.X.ToString(), out error);
-                RunPMLCommandInParentheses(svert, "PY", vert.Y.ToString(), out error);
+                PMLCommander.RunPMLCommandInParentheses(svert, "PX", vert.X.ToString(), out error);
+                PMLCommander.RunPMLCommandInParentheses(svert, "PY", vert.Y.ToString(), out error);
             }
 
         }
@@ -81,17 +81,17 @@ namespace modelcatalogue.Create
 
             lpyr.SetAttribute(DbAttributeInstance.TUFL, true);
             var error = string.Empty;
-            RunPMLCommand(lpyr, "PBTP", size.XLength.ToString(), out error);
-            RunPMLCommand(lpyr, "PCTP", size.YLength.ToString(), out error);
-            RunPMLCommand(lpyr, "PBBT", size.XLength.ToString(), out error);
-            RunPMLCommand(lpyr, "PCBT", size.YLength.ToString(), out error);
-            RunPMLCommand(lpyr, "PTDI", size.ZLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(lpyr, "PBTP", size.XLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(lpyr, "PCTP", size.YLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(lpyr, "PBBT", size.XLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(lpyr, "PCBT", size.YLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(lpyr, "PTDI", size.ZLength.ToString(), out error);
 
 
-            RunPMLCommand(lpyr, "PBAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(lpyr, "PCAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(lpyr, "PBAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(lpyr, "PCAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         public void SDSH(Buildable element) {
             Direction direction = element.Direction;
@@ -103,10 +103,10 @@ namespace modelcatalogue.Create
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
 
             var error = string.Empty;
-            RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
-            RunPMLCommand(geom, "PHEI", size.Height.ToString(), out error);
-            RunPMLCommand(geom, "PRAD", size.ZLength.ToString(), out error);
-            RunPMLCommand(geom, "PAXI", $"P{ptca.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PHEI", size.Height.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PRAD", size.ZLength.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PAXI", $"P{ptca.GetAsString(DbAttributeInstance.NUMB)}", out error);
 
             //geom.SetAttribute(DbAttributeInstance.PHEI, size.YLength);
             //geom.SetAttribute(DbAttributeInstance.PRAD, size.ZLength.ToString());
@@ -126,9 +126,9 @@ namespace modelcatalogue.Create
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
 
             var error = string.Empty;
-            RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
-            RunPMLCommand(geom, "PAAX", $"P{ptca1.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(geom, "PBAX", $"P{ptca2.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PAAX", $"P{ptca1.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PBAX", $"P{ptca2.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         public void SCYL(Buildable element) {
             Direction direction = element.Direction;
@@ -139,9 +139,9 @@ namespace modelcatalogue.Create
 
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
             var error = string.Empty;
-            RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
-            RunPMLCommand(geom, "PHEI", size.Height.ToString(), out error);
-            RunPMLCommand(geom, "PAXIS", $"-P{ptca.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PHEI", size.Height.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PAXIS", $"-P{ptca.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         public void LSNO(Buildable element) {
             Direction direction = element.Direction;
@@ -154,15 +154,15 @@ namespace modelcatalogue.Create
             geom.SetAttribute(DbAttributeInstance.TUFL, true);
             geom.SetAttribute(DbAttributeInstance.CLFL, false);
 
-            RunPMLCommand(geom, "PTDI", size.Height.ToString(), out var error);
+            PMLCommander.RunPMLCommand(geom, "PTDI", size.Height.ToString(), out var error);
             //invert top and bot in paragon...
-            RunPMLCommand(geom, "PTDM", size.BotDiameter.ToString(), out error);
-            RunPMLCommand(geom, "PBDM", size.TopDiameter.ToString(), out error);
-            RunPMLCommand(geom, "POFF", "0", out error);
+            PMLCommander.RunPMLCommand(geom, "PTDM", size.BotDiameter.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "PBDM", size.TopDiameter.ToString(), out error);
+            PMLCommander.RunPMLCommand(geom, "POFF", "0", out error);
 
 
-            RunPMLCommand(geom, "PAAXIS", $"-P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            RunPMLCommand(geom, "PBAXIS", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PAAXIS", $"-P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
+            PMLCommander.RunPMLCommand(geom, "PBAXIS", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         private int _nozzlePpointIndex = 0;
         private int[] _validNozzlePpoints = new int[6] { 1, 2, 4, 5, 6, 7};
@@ -194,7 +194,7 @@ namespace modelcatalogue.Create
             }
             if (_usedNozzlePpoints.Contains(ppoint) || ppoint <= 0 || ppoint > _validNozzlePpoints.Last()) {
 
-                RunPMLCommand($"Invalid ppoint {ppoint} supplied for nozzle, will not create");
+                PMLCommander.RunPMLCommand($"Invalid ppoint {ppoint} supplied for nozzle, will not create");
                 return;
 
             } else {
@@ -208,13 +208,13 @@ namespace modelcatalogue.Create
             ptca.SetAttribute(DbAttributeInstance.NUMB, number);
 
             var error = string.Empty;
-            RunPMLCommandInParentheses(ptca, "PX", position.XString(), out error);
-            RunPMLCommandInParentheses(ptca, "PY", position.YString(), out error);
-            RunPMLCommandInParentheses(ptca, "PZ", position.ZString(), out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PX", position.XString(), out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PY", position.YString(), out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PZ", position.ZString(), out error);
 
-            RunPMLCommand(ptca, "PBOR", size.ToString(), out error);
-            RunPMLCommand(ptca, "PCON", coco, out error);
-            RunPMLCommand(ptca, "PTCDI", direction, out error);
+            PMLCommander.RunPMLCommand(ptca, "PBOR", size.ToString(), out error);
+            PMLCommander.RunPMLCommand(ptca, "PCON", coco, out error);
+            PMLCommander.RunPMLCommand(ptca, "PTCDI", direction, out error);
 
 
             return ptca;
@@ -239,42 +239,15 @@ namespace modelcatalogue.Create
 
             int number = _ppointCounter++;
             //ptca.SetAttribute(DbAttributeInstance.NUMB, number);
-            RunPMLCommand(ptca, "NUMB", number.ToString(), out error);
+            PMLCommander.RunPMLCommand(ptca, "NUMB", number.ToString(), out error);
 
-            RunPMLCommandInParentheses(ptca, "PX", position.XString(), out error);
-            RunPMLCommandInParentheses(ptca, "PY", position.YString(), out error);
-            RunPMLCommandInParentheses(ptca, "PZ", position.ZString(), out error);
-            RunPMLCommand(ptca, "PTCDI", direction, out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PX", position.XString(), out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PY", position.YString(), out error);
+            PMLCommander.RunPMLCommandInParentheses(ptca, "PZ", position.ZString(), out error);
+            PMLCommander.RunPMLCommand(ptca, "PTCDI", direction, out error);
 
             return ptca;
         }
-        private bool RunPMLCommandInParentheses(DbElement ce, string attribute, string command, out string error) {
-            return RunPMLCommand(ce, attribute, $"({command})", out error);
-        }
-        private bool RunPMLCommand(DbElement ce, string attribute, string command, out string error) {
-            if (command.Length == 0) {
-                error = "Command is empty";
-                return false;
-            }
-            CurrentElement.Element = ce;
-            Command pmlCommand;
-
-            pmlCommand = Command.CreateCommand(attribute + " " + command);
-
-            var result = pmlCommand.RunInPdms();
-            error = pmlCommand.Error.MessageText();
-            return result;
-        }
-        private bool RunPMLCommand(string command) {
-            if (command.Length == 0) {
-                return false;
-            }
-            Command pmlCommand;
-
-            pmlCommand = Command.CreateCommand(command);
-
-            var result = pmlCommand.RunInPdms();
-            return result;
-        }
+       
     }
 }

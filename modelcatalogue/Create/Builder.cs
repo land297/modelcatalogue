@@ -35,6 +35,22 @@ namespace modelcatalogue.Create
             text.CreateOrUpdateSDTE(equi, Cate.Element);
 
 
+            // need to save first
+            // and then loop through all others, and see if they do not match, and update to new
+            // parameter and stuff..
+            var builableWithnozzleConfig = buildables.FirstOrDefault(b => b.NozzleConfig != null);
+            if (builableWithnozzleConfig != null) {
+                DbElement dataset = DbElement.GetElement();
+                scom.GetValidRef(DbAttributeInstance.DTRE, ref dataset);
+                //dataset.CopyHierarchyPhase1(builableWithnozzleConfig.NozzleConfig.Dataset, new DbCopyOption());
+                //dataset.Copy(builableWithnozzleConfig.NozzleConfig.Dataset);
+                dataset.CopyHierarchy(builableWithnozzleConfig.NozzleConfig.Dataset, new DbCopyOption());
+                scom.SetAttribute(DbAttributeInstance.PARA, builableWithnozzleConfig.NozzleConfig.Parameters);
+                
+
+
+            }
+
             return scom;
         }
 
