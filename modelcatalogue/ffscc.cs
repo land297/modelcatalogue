@@ -40,89 +40,35 @@ namespace modelcatalogue
 
         [PMLNetCallable()]
         public void Include(string equipmentName, string specNaem, string specTypeAnswer, string skey) {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
-            var builder = new Builder();
-            var spec = MDB.CurrentMDB.FindElement(DbType.Catalog, specNaem);
-            var equi = MDB.CurrentMDB.FindElement(DbType.Design, equipmentName);
+            try {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+                var builder = new Builder();
+                var spec = MDB.CurrentMDB.FindElement(DbType.Catalog, specNaem);
+                var equi = MDB.CurrentMDB.FindElement(DbType.Design, equipmentName);
 
-            builder.Cata = Cata.GetWritable(equi);
-            builder.Cate = new Cate();
-            builder.Reader = new Reader();
-            builder.Reader.Converter = new ConvertToBuildable.Convert();
+                builder.Cata = Cata.GetWritable(equi);
+                builder.Cate = new Cate();
+                builder.Reader = new Reader();
+                builder.Reader.Converter = new ConvertToBuildable.Convert();
 
-            var scom = builder.BuildScom(equi);
+                var scom = builder.BuildScom(equi);
 
-            var spcoInfo = new Create.SpcoFull(scom, equi, specTypeAnswer,skey);
-            var specManager = new Create.SpecManager(spec,spcoInfo.FirstSeleTans);
-            specManager.AddSpco(spcoInfo);
+                var spcoInfo = new Create.SpcoRepresentation(scom, equi, specTypeAnswer, skey);
+                spcoInfo.DefineMatxt(builder.Cata);
+
+                var specManager = new Create.SpecManager(spec, spcoInfo.FirstSeleTans);
+                specManager.AddSpco(spcoInfo);
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Source);
+            }
 
         }
 
         [PMLNetCallable()]
         public void Include(string equipmentName, string specNaem) {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
-            var builder = new Builder();
-            var spec = MDB.CurrentMDB.FindElement(DbType.Catalog, specNaem);
-            var equi = MDB.CurrentMDB.FindElement(DbType.Design, equipmentName);
-
-            //var cataName = equi.Owner.Owner.Name() + "-CATA";
-            //Db[] dbs = MDB.CurrentMDB.GetDBArray();
-            //DbElement cata = MDB.CurrentMDB.FindElement(DbType.Catalog, cataName);
-            //Db db = default(Db);
-            //if (!cata.IsValid) {
-            //    //find cata dbs with dbwrite eq true
-            //    DbElement e = MDB.CurrentMDB.FindElement(cataName);
-            //    if (e.IsValid) {
-            //        Console.WriteLine(e.Name());
-            //    }
-            //    db = dbs.FirstOrDefault(d => d.Type == DbType.Catalog && !d.IsReadOnly);
-
-            //    Console.WriteLine($"can write to:{ db.Number} - { db.IsReadOnly}- { db.Type}");
-            //    cata = db.World.Create(1, DbElementTypeInstance.CATALOGUE);
-            //    cata.SetAttribute(DbAttributeInstance.NAME, cataName);
-            //} else {
-            //    db = cata.Db;
-            //}
-
-
-            builder.Cata = Cata.GetWritable(equi);
-            //var cateCreator = new Create.Cate(cata);
-            builder.Cate = new Cate();
-            builder.Reader = new Reader();
-            builder.Reader.Converter = new ConvertToBuildable.Convert();
-
-            var scom = builder.BuildScom(equi);
-            
-            //get size
-            //try {
-            //    DbCollection collection = null;
-            //    DbCollection.Parse($"COLLECT ALL NOZZ FOR {equi}", out collection, out PdmsMessage error);
-            //    var content = collection.Evaluate();
-            //} catch { }
-
-            // TODO: support different size valves
-            // size of valve, first nozzles p1bore
-            //DBElementCollection elementCollection = new DBElementCollection(equi, new TypeFilter(DbElementTypeInstance.NOZZLE));
-            //var qualifer = new DbQualifier(); 
-            //qualifer.Add(1);
-
-            //var size = elementCollection.First().GetAsString(DbAttributeInstance.PPBO, qualifer);
-
-            //Dictionary<DbElement, DbElement> scomsEquipments = new Dictionary<DbElement, DbElement>();
-            //scomsEquipments.Add(scom, equi);
-
-            //foreach (var kvp in scomsEquipments) {
-                var spcoInfo = new Create.SpcoFull(scom, equi);
-                //var specName = kvp.Value.Owner.Owner.Name() + specWldName;
-                //if (spec.IsValid == false) {
-                 //   var specManager = new Create.SpecManager(specWld, specName);
-                 //   specManager.AddSpco(spcoInfo);
-
-                //} else {
-                    var specManager = new Create.SpecManager(spec,spcoInfo.FirstSeleTans);
-                    specManager.AddSpco(spcoInfo);
-                //}
-            //}
+            Include(equipmentName, specNaem, string.Empty, string.Empty);
         }
 
         //[PMLNetCallable()]
