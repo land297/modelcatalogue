@@ -38,6 +38,26 @@ namespace modelcatalogue.ConvertToBuildable
                     if (catrefOfCatref.GetValidRefArray(DbAttributeInstance.BLRF, ref blrfarray)) {
                         nozzleConfig.Blrfarray = blrfarray;
                     }
+                    
+                    var attributes = catrefOfCatref.GetAttributes();
+                    foreach (DbAttribute item in attributes) {
+                        Console.WriteLine(item.Description);
+                    }
+
+
+                    nozzleConfig.Parameters = catrefOfCatref.GetDoubleArray(DbAttributeInstance.PARA);
+
+                    var dataset = DbElement.GetElement();
+                    if (catrefOfCatref.GetValidRef(DbAttributeInstance.DTRE, ref dataset)) {
+                        nozzleConfig.Dataset = dataset;
+                    } 
+                    //if (!dataset.IsValid) {
+                    //    var flanScom = MDB.CurrentMDB.FindElement("/EMFWBR0-40-0");
+                    //    if (flanScom.GetValidRef(DbAttributeInstance.DTRE, ref dataset)) {
+                    //        Console.WriteLine(dataset);
+                    //        nozzleConfig.Dataset = dataset;
+                    //    }
+                    //}
                 }
             }
 
@@ -51,10 +71,7 @@ namespace modelcatalogue.ConvertToBuildable
                     nozzleConfig.Ppoint = p;
                 }
             }
-
-
-                return new Buildable(DbElementTypeInstance.NOZZLE, element, size, position, direction, nozzleConfig);
-
+            return new Buildable(DbElementTypeInstance.NOZZLE, element, size, position, direction, nozzleConfig);
         }
     }
 
@@ -62,5 +79,9 @@ namespace modelcatalogue.ConvertToBuildable
         public string Coco { get; set; }
         public DbElement[] Blrfarray { get; set; }
         public int Ppoint { get; set; } = -1;
+
+        public DbElement Dataset { get; set; }
+        public double[] Parameters { get; set; }
+        //public 
     }
 }
