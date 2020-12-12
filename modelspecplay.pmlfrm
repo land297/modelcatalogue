@@ -25,22 +25,39 @@ setup form !!modelspecplay resize
 			button .buIncludeInSpec '> Include selected valves ' at xmin - 14 ymax.f2  callback '!this.IncludeSelected()'
 		exit
 		frame .framBuild 'Create/Modify Group' dock fill
-			button .buCMSelect 'Select/Create Group(Zone)' at xmin ymax + 0.5 callback '!this.CMSelectCreate()'
-			text .textCreateCe  tagwid 3 ''  at xmax + 0.5 ymin width 15 is string
+			frame .framSelect 'Select/Create'
+				button .buCMSelect 'Group(Zone)' at xmin ymax + 0.5 callback '!this.CMSelectCreate()'
+				text .textCreateCe  tagwid 3 ''  at xmax + 0.5 ymin width 15 is string
+			exit
 			
+			frame .framGroupInfo 'Group information' at xmin.framSelect ymax.framSelect
+				text .textDetailText  tagwid 8 'Detail text' at xmin ymax + 0.5 width 20 is string
+				paragraph .paraDetailTextSize at xmax + 0.5 ymin text |Use @SIZE to represent actual size in text|
+				text .textMaterial  tagwid 8 'Material'  at xmin.textDetailText ymax.textDetailText + 0.5 width 15 is string
+				text .textSkey  tagwid 8 'Skey'  at xmin ymax + 0.5 width 5 is string
+				button .buSetSkeyFromModel 'Set from model' tooltip 'Will set a defaul SKEY based on nozzle connection' at xmax + 0.5 ymin call '!this.SetSkeyFromModel()'
+				text .textStype  tagwid 8 'Stype'  at xmin.textSkey ymax.textSkey + 0.5 width 5 is string
+				text .textType  tagwid 8 'Type'  at xmin ymax + 0.5 width 5 is string
+				paragraph .paraType at xmax + 0.5 ymin text 'Read only field'
+				button .buCMModify 'Modify' at xmin.textType ymax.textType + 0.5 callback '!this.CMModify()'
+			exit 
 			
-			text .textDetailText  tagwid 8 'Detail text'  at xmin.buCMSelect ymax.buCMSelect + 1 width 15 is string
-			text .textMaterial  tagwid 8 'Material'  at xmin ymax + 0.5 width 15 is string
-			text .textSkey  tagwid 8 'Skey'  at xmin ymax + 0.5 width 5 is string
-			text .textStype  tagwid 8 'Stype'  at xmin ymax + 0.5 width 5 is string
-			button .buCMModify 'Modify' at xmin ymax + 0.5 callback '!this.CMModify()'
+			paragraph .paraDetails at xmin ymax + 0.5  text |Details|
+			container .conDetailsGrid PmlNetControl 'connections' at xmin ymax + 0.2 width 65 height 10
+			
+			frame .framAids 'Aids' at xmin ymax + 1
+				button .buCMShowDesignAids 'Show design aids on selected Equi' at xmin ymax + 0.3 callback '!this.DrawAids()'
+				button .buCMClearDesignAids 'Clear design aids' at xmin ymax + 0.3 callback '!this.ClearAids()'
+			exit
 		exit
 	exit
-		
+	
+	member .DetailsGrid is NetGridControl
 	member .ValveTypesGrid is NetGridControl
 	member .ValveTypeSizes is NetGridControl
 	member .WritableSpecs is NetGridControl
 	member .ValvesInWritableSpec is NetGridControl
+	member .aidNumber is Real
 
 	menu .menuValveTypes popup
 		!this.menuValveTypes.add( 'callback', 'Select', '!this.Select()' )
@@ -49,7 +66,18 @@ setup form !!modelspecplay resize
 	menu .menuValveSizes popup
 		!this.menuValveSizes.add( 'callback', 'Add + Select', '!this.AddSelect()' )
 	
-	
+	menu .menuDetails popup
+		!this.menuDetails.add( 'callback', 'Change from Flange to Wafer', '!this.ChangeFlangeToWafer()' )
+		
+	menu .menuCocos popup
+		!cocodes = !!CollectAllFor('COCDES','',WORLD)
+		do !cd values !cocodes
+			!desc = !cd.Description
+			!coco = !cd.coconnection
+			!this.menuCocos.add('callback','$!desc - $!coco','!this.ChangeCoco(|coco|)')
+		enddo
+		
+	!this.menuDetails.add('MENU','Change COCO','menuCocos')
 exit
 
 
@@ -85,10 +113,35 @@ define method .modelspecplay()
 	!this.ValvesInWritableSpec.bulkEditableGrid(false)
 	!this.ValvesInWritableSpec.outlookGroupStyle(false)
 	
-	!this.formTitle = 'modelspecplay'
+	!this.DetailsGrid= object NetGridControl() 
+	!this.conDetailsGrid.control = !this.DetailsGrid.handle()
+	!this.DetailsGrid.columnExcelFilter(true)
+	!this.DetailsGrid.bulkEditableGrid(false)
+	!this.DetailsGrid.outlookGroupStyle(false)
+	--!this.DetailsGrid.addeventhandler('OnPopup', !this, 'detailsOnPopup')
+	
+	import 'modelcatalogue'
+	handle(1000,0)
+	endhandle
+	using NameSpace 'modelcatalogue'
+	
+	!test = object ffscc()
+	!dllVersion =  !test.getversion()
+	!pmlVersion = '0.1'
+	!this.formTitle = 'modelspecplay - [verions: (' + !pmlVersion + ') (' + !dllVersion + ')]'
 	!this.cancelcall  = '!this.closecall()'
 	
 	!this.Refresh()
+	
+	if !!COMMODULECACHE.appname.eqNoCase('paragon') then
+		!this.framBuild.visible = false
+		
+	else
+		!this.buIncludeInSpec.visible = false
+		!this.aidNumber = !!aidNumbers.add('modelspecplay')
+	endif
+	
+	!this.textType.editable = false
 endmethod
 
 define method .Refresh()
@@ -107,19 +160,29 @@ define method .ExtractAndBindValeTypesGrid(!zones is array)
 	!headings.Append('Material')
 	!headings.Append('Skey')
 	!headings.Append('Stype')
+	!headings.Append('Type')
 	
 	!rows = object array()
 	do !z values !zones
-		!dtxt = !!CollectAllFor('TEXT','PURP EQ |DTXT|',!z).first()
-		!mtxt = !!CollectAllFor('TEXT','PURP EQ |MTXT|',!z).first()
-		!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!z).first()
-		!stype = !z.func
+		!dtxt = !!CollectAllFor('TEXT','PURP EQ |DTXT|',!z).first().stext
+		!mtxt = !!CollectAllFor('TEXT','PURP EQ |MTXT|',!z).first().stext
+		!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!z).first().stext
+		!stype = !!CollectAllFor('TEXT','PURP EQ |STYP|',!z).first().stext
+		handle any
+			!stype = ''
+		endhandle
+		!type = !!CollectAllFor('TEXT','PURP EQ |TYPE|',!z).first().stext
+		handle any
+			!type = 'VALV'
+		endhandle
+		
 		!row = object array()
 		!row.append(!z.name)
-		!row.append(!dtxt.stext)
-		!row.append(!mtxt.stext)
-		!row.append(!skey.stext)
+		!row.append(!dtxt)
+		!row.append(!mtxt)
+		!row.append(!skey)
 		!row.append(!stype)
+		!row.append(!type)
 		!rows.append(!row)
 	enddo
 	
@@ -168,9 +231,12 @@ define method .IncludeSelected()
 
 	-- create scom
 	!test = object ffscc()
+	q var !test.methods()
 	!spec = !this.WritableSpecs.GETSELECTEDROWS()[1][1]
 	do !selected values !this.ValveTypeSizes.GETSELECTEDROWS()
 		!name = !selected[1]
+		q var !name
+		q var !spec
 		!test.Include(!name, !spec)
 	enddo
 endmethod
@@ -195,7 +261,80 @@ define method .AddSelect()
 	ADD $!valveType
 	$!valveType
 endmethod
+define method .detailsOnPopup(!data is ARRAY)
+  !this.conDetailsGrid.popup = !this.menuDetails
+  !this.conDetailsGrid.showPopup(!data[0], !data[1])
+endmethod
+define method .ChangeCoco(!coco is string)
+	!rows = !this.DetailsGrid.getselectedrows()
+	!rowTags = !this.DetailsGrid.GETSELECTEDROWTAGS()
 
+	do !i to !rowTags.size()
+		!tag = !rowTags[!i]
+		
+		!row = !this.DetailsGrid.getrow(!tag)
+		!nozzle = !row[2].dbref()	
+		!nozzle.description = !coco
+	enddo
+endmethod
+define method .ChangeFlangeToWafer()
+	!rows = !this.DetailsGrid.getselectedrows()
+	!rowTags = !this.DetailsGrid.GETSELECTEDROWTAGS()
+
+	do !i to !rowTags.size()
+		!tag = !rowTags[!i]
+		
+		!row = !this.DetailsGrid.getrow(!tag)
+		!nozzle = !row[2].dbref()
+		!waferCoco = !this.FlanCocoToWaferCoco(!nozzle.ppcon[1])
+		if !waferCoco eq '' then
+			!!Alert.Error('Could not find Wafer variant from ' + !nozzle.ppcon[1])
+			return
+		endif
+		!nozzle.description = !waferCoco
+	enddo
+endmethod
+define method .FlanCocoToWaferCoco(!fcoco is string) is string
+	!coco = !this.FlanCocoToGaskCocos(!fcoco, 1)
+	if !coco eq '' then
+		!coco = !this.FlanCocoToGaskCocos(!fcoco, 2)
+	endif
+	
+	return !coco
+endmethod
+define method .FlanCocoToGaskCocoToWaferCoco(!fcoco is string, !ctype is real) is string
+	if !ctype eq 2 then
+		!gctype = 1
+	else
+		!gctype = 2
+	endif
+	!cocos = !!CollectAllFor('COCO', 'CTYPE[$!ctype] EQ |$!fcoco|',WORLD)
+
+	do !coco values !cocos
+		!gasketCoco = !coco.ctype[!gctype]
+		!waferCoco = !this.GasCocoToWaferCoco(!gasketCoco,1)
+		if !waferCoco eq '' then
+			!waferCoco = !this.GasCocoToWaferCoco(!gasketCoco,2)
+		endif
+		if !waferCoco ne '' then
+			return !waferCoco
+		endif
+	enddo
+	return ''
+endmethod
+define method .GasCocoToWaferCoco(!gcoco is string,!ctype is real) is string
+	if !ctype eq 2 then
+		!gctype = 1
+	else
+		!gctype = 2
+	endif
+	
+	!cocosW = !!CollectAllFor('COCO', 'SUBSTRING(CTYPE[$!ctype],1,1) EQ |W| AND CTYPE[$!ctype] EQ |$!gcoco| ',WORLD)
+	if !cocosW.size() gt 0 then
+		return !cocosW[1].ctype[!ctype]
+	else
+	return ''
+endmethod
 
 define method .afterSelectChangeValveTypes(!a is ARRAY)
 	--q var !this.ValveTypesGrid.GETSELECTEDROWS()
@@ -228,13 +367,10 @@ define method .ExtractAndBindValeTypesSizesGrid(!zone is dbref)
 		
 		!row = object array()
 		!row.append(!e.name)
-		!row.append(!nozzle.ppbore[1].string())
-		!row.append(!nozzle.ppcon[1].string())
-		if !nozzle.catref.catref.Blrfarray.unset() then
-			!row.append('N/A')
-		else
-			!row.append(!nozzle.catref.catref.Blrfarray.first().name)
-		endif
+		!data = !this.GetNozzleData(!nozzle)
+		!row.append(!data[1])
+		!row.append(!data[2])
+		!row.append(!data[3])
 
 		--!row.append(!skey.stext)
 		!rows.append(!row)
@@ -288,6 +424,14 @@ define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
 			skip
 		endhandle
 		!row.append(!s.ppbore[1].real().value())
+		handle any
+			q var !s.ppbore[1]
+			handle any
+				q var !!error
+			endhandle
+			q var !!error
+			!row.append('error')
+		endhandle
 		if !s.catref.Blrfarray.unset() then
 			!row.append('N/A')
 		else
@@ -309,13 +453,26 @@ define method .CMSelectCreate()
 	!cex = !!ce
 	ZONE
 	handle any
+		-- ce might be a Site or we are in wrong database hierarchy
 	endhandle
 	
 	!ce = !!ce
 	if !ce.type eq 'ZONE' and !ce.owner.func.eqNoCase('AMTP') then
 		!this.LoadGroup(!ce)
 	elseif !ce.type eq 'SITE' and !ce.func.eqNoCase('AMTP') then
-		!this.CreateGroup(!ce)	
+		!this.CreateGroup(!ce)
+	else
+		!answer = !!Alert.Confirm('No Site with attribute Func = ATMP found. Do you wish to create?')
+		if !answer.eqNoCase('YES') then
+			NEW SITE
+			handle any
+			
+			elsehandle none
+				FUNC 'AMTP'
+				-- call self again to create the group
+				!this.CMSelectCreate()
+			endhandle
+		endif
 	endif
 	
 	!!ce = !cex
@@ -346,10 +503,29 @@ define method .CMModify()
 		!skey = !!ce
 	endhandle
 	
+	!stype = !!CollectAllFor('TEXT','PURP EQ |STYP|',!zone).first()
+	handle any
+		$!zone
+		NEW TEXT PURP STYP
+		!stype = !!ce
+	endhandle
+	
+	!type = !!CollectAllFor('TEXT','PURP EQ |TYPE|',!zone).first()
+	handle any
+		$!zone
+		NEW TEXT PURP TYPE
+		STEXT 'VALV'
+		!type = !!ce
+	endhandle
+	
+	
 	!dtxt.stext = !this.textDetailText.val
 	!mtxt.stext = !this.textMaterial.val
 	!skey.stext = !this.textSkey.val
-	!zone.func = !this.textStype.val
+	!stype.stext = !this.textStype.val
+	!type.stext = !this.textType.val
+	
+	!this.BindToDetailsGrid(!zone)
 endmethod
 define method .LoadGroup(!zone is dbref)
 	!this.textCreateCe.val = !zone.name
@@ -372,12 +548,29 @@ define method .LoadGroup(!zone is dbref)
 		NEW TEXT PURP SKEY
 		!skey = ''
 	endhandle
-	!stype = !zone.func
+	
+	!stype = !!CollectAllFor('TEXT','PURP EQ |STYP|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP STYP
+		!stype = ''
+	endhandle
+	
+	!type = !!CollectAllFor('TEXT','PURP EQ |TYPE|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP TYPE
+		STEXT 'VALV'
+		!type = 'VALV'
+	endhandle
+	
 	
 	!this.textDetailText.val = !dtxt
 	!this.textMaterial.val = !mtxt
 	!this.textSkey.val = !skey
 	!this.textStype.val = !stype
+	!this.textType.val = !type
+	!this.BindToDetailsGrid(!zone)
 endmethod
 
 define method .CreateGroup(!site is dbref)
@@ -398,3 +591,145 @@ define method .CreateGroup(!site is dbref)
 	!this.LoadGroup(!zone)
 	
 endmethod
+define method .ClearAids()
+	AID CLEAR ALL $!<this.aidNumber>
+endmethod
+define method .DrawAids()
+	!this.ClearAids()
+	
+	!ce = !!ce
+	EQUI
+	handle any
+	endhandle
+	if !!ce.type ne 'EQUI' then
+		return
+	endif
+	!equi = !!ce
+	
+	!pos = !equi.position
+	!dirX = !equi.orientation.xdir()
+	!dirY = !equi.orientation.ydir()
+	!dirZ = !equi.orientation.zdir()
+	
+	!vol = object volume(!equi)
+	!box = !vol.box()
+	!lengthX = !box.xlength * 1.2
+	!lengthY = !box.ylength * 1.2
+	!lengthZ = !box.zlength * 1.2
+	
+	AID ARROW NUMBER $!<this.aidNumber> AT $!pos DIRECTION $!dirX HEIGHT $!lengthX
+	AID ARROW NUMBER $!<this.aidNumber> AT $!pos DIRECTION $!dirY HEIGHT $!lengthY
+	AID ARROW NUMBER $!<this.aidNumber> AT $!pos DIRECTION $!dirZ HEIGHT $!lengthZ
+
+	!nozzles = !!CollectAllFor('NOZZ','',!equi)
+	do !i to !nozzles.size()
+		!pos = !nozzles[!i].position
+		!dir = !nozzles[!i].pdir[1]
+		AID ARROW NUMBER $!<this.aidNumber> AT $!pos DIRECTION $!dir HEIGHT 100
+		AID TEXT NUMBER $!<this.aidNumber> 'P$!i' AT $!pos
+	enddo
+	!!ce = !ce
+endmethod
+define method .GetNozzleData(!nozzle is dbref) is array
+	!return = object array()
+	if !nozzle.desc.eqNoCase('') then
+		!return.append(!nozzle.ppbore[1].real().value())
+		!return.append(!nozzle.ppcon[1])
+		if !nozzle.catref.catref.blrfarray.size() gt 0 then
+			!return.append(!nozzle.catref.catref.blrfarray[1].name)
+		else
+			!return.append('')
+		endif
+	else
+		!return.append(!nozzle.ppbore[1].real().value())
+		!return.append(!nozzle.description)
+		if !nozzle.catref.catref.blrfarray.size() gt 0 and !nozzle.description.substring(1,1) eq 'F' then
+			!return.append(!nozzle.catref.catref.blrfarray[1].name)
+		else
+			!return.append('')
+		endif
+	endif
+	--1 size
+	--2 connectiontype
+	--3 bolting
+	return !return
+endmethod
+define method .SetSkeyFromModel() is string
+	!zone = !this.textCreateCe.val.dbref()
+	!type = !!CollectAllFor('TEXT','PURP EQ |TYPE|',!zone).first().stext
+	handle any
+		$!zone
+		NEW TEXT PURP TYPE
+		STEXT 'VALV'
+		!type = 'VALV'
+	endhandle
+	-- does not handle different connections on the nozzles
+	!connection = ''
+	!nozzles = !!CollectAllFor('NOZZ','',!zone)
+	--do !nozzle values !nozzles
+	!data = !this.GetNozzleData(!nozzles[1])
+	if !data[2].substring(1,1).eqNoCase('F') then
+		!connection = 'FL'
+	elseif !data[2].substring(1,1).eqNoCase('W') then
+		!connection = 'CP'
+	else
+		!connection = 'BW'
+	endif
+			
+	!skey = ''
+	if !type.eqNoCase('VALV') then
+				!skey = 'VV' + !connection
+	endif
+	if !skey ne '' then
+		!this.textSkey.val = !skey
+	endif
+endmethod
+define method .BindToDetailsGrid(!zone is dbref)
+	--!zone = !this.textCreateCe.val.dbref()
+	!nozzles = !!CollectAllFor('NOZZ','',!zone)
+	
+	!heading = object array()
+	!heading.append('Name')
+	!heading.append('Nozzle')
+	!heading.append('Number')
+	!heading.append('Size')
+	!heading.append('Connection')
+	!heading.append('Bolts')
+	
+	!rows = object array()
+	!exp = object expression('NAME OF EQUI')
+	do !nozzle values !nozzles
+		!row = object array()
+		!row.append(!exp.evaluate(!nozzle))
+		if !nozzle.isnamed then
+			!row.append(!nozzle.name)
+		else
+			!row.append(!nozzle.refno.string())
+		endif
+		!row.append(!this.NozzleNumberAsString(!nozzle))
+		!data = !this.GetNozzleData(!nozzle)
+		!row.append(!data[1])
+		!row.append(!data[2])
+		!row.append(!data[3])
+		!rows.append(!row)
+	enddo
+	
+	using namespace 'Aveva.Core.Presentation'
+   !nds = object NetDataSource('DetailsGrid', !heading, !rows)
+   !this.DetailsGrid.BindToDataSource(!nds)
+endmethod
+define method .NozzleNumberAsString(!nozzle is dbref) is string
+	if !nozzle.name.occurs('P#') gt 0 then
+		return !nozzle.name.split('#').last()
+	else
+		return !nozzle.sequ.string()
+	endif
+
+
+--!this.aidNumber = !!aidNumbers.add('Ceiling grid, grid tags')
+--	Line 2097:     AID ARROW NUMBER $!<this.aidNumber> AT $!tagPosition DIRECTION $!<direction> HEIGHT 500mm PROPORTION 0.1
+--	Line 2111:       AID ARROW NUMBER $!<this.aidNumber> AT $!tagPosition DIRECTION $!direction HEIGHT 500mm
+--	Line 2111:       AID ARROW NUMBER $!<this.aidNumber> AT $!tagPosition DIRECTION $!direction HEIGHT 500mm
+--	Line 2113:       AID TEXT NUMBER $!<this.aidNumber> '$!rotateGadget.val' AT $!anglePoint
+--	Line 2113:       AID TEXT NUMBER $!<this.aidNumber> '$!rotateGadget.val' AT $!anglePoint
+--		Line 2442:   AID CLEAR ALL $!<this.aidNumber>

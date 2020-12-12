@@ -8,6 +8,7 @@ using System.Text;
 namespace modelcatalogue {
     public class Buildable {
         public DbElementType BuildAs { get; private set; }
+        public DbElementType SourceType { get; private set; }
         private DbElement _element;
         public Size Size { get; private set; }
         // TOOD: change to lists..
@@ -26,12 +27,13 @@ namespace modelcatalogue {
             NozzleConfig = nozzleConfig;
             BuildAs = buildAs;
         }
-        public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction) {
+        public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction,DbElementType sourceType) {
             BuildAs = buildAs;
             _element = element;
             Size = size;
             Position = position;
             Direction = direction;
+            SourceType = sourceType;
         }
         public Buildable(DbElementType buildAs, DbElement element, Size size, Position position, Direction direction, Position p2, Direction d2) {
             BuildAs = buildAs;

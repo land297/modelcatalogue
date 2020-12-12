@@ -20,6 +20,8 @@ namespace modelcatalogue.ConvertToBuildable
 
             var q = new DbQualifier();
             q.Add(6);
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
+
             var pos = element.GetPosition(DbAttributeInstance.PPOS, q);
             position.X = pos.X;
             position.Y = pos.Y;
@@ -31,7 +33,7 @@ namespace modelcatalogue.ConvertToBuildable
             direction.Z = orientation.ZDir().ToString();
 
 
-            return new Buildable(DbElementTypeInstance.LPYRAMID, element, size, position, direction);
+            return new Buildable(DbElementTypeInstance.LPYRAMID, element, size, position, direction,element.ElementType);
 
         }
     }

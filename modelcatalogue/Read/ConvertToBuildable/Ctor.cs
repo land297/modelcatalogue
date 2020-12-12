@@ -18,6 +18,7 @@ namespace modelcatalogue.ConvertToBuildable
 
             var q = new DbQualifier();
             q.Add(1);
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
             var pos = element.GetPosition(DbAttributeInstance.PPOS, q);
             position.X = pos.X;
             position.Y = pos.Y;
@@ -31,6 +32,7 @@ namespace modelcatalogue.ConvertToBuildable
             //TODO: fix mess
             q = new DbQualifier();
             q.Add(2);
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
             Position position2 = new Position();
             Direction direction2 = new Direction();
 

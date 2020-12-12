@@ -26,20 +26,11 @@ namespace modelcatalogue.Create
             }
         }
         public DbElement Scom { get; private set; }
-        private string _stype;
-        public string Stype { get { return _stype ?? _equipment.Owner.GetString(DbAttributeInstance.FUNC); } }
+        public string Stype { get; private set; }
         public string FirstSeleTans { get; private set; } 
         public string Skey { get; private set; }
         public string Name { get { return Scom.Name().Replace(".SCOM", string.Empty) + ".SPCO"; } }
 
-        public SpcoRepresentation(DbElement scom, DbElement equipment, string stype, string skey) : this(scom,equipment){
-            if (!string.IsNullOrWhiteSpace(stype)) {
-                _stype = stype;
-            }
-            if (!string.IsNullOrWhiteSpace(skey)) {
-                Skey = skey;
-            }
-        }
 
         public void DefineMatxt(DbElement cata) {
             DbElement sect = cata.Members().SingleOrDefault(s => s.GetString(DbAttributeInstance.DESC) == "MaterialContainer");
@@ -69,7 +60,30 @@ namespace modelcatalogue.Create
             
             MatxtTextElement = possbileMatxts.First();
             
+            var possbileStypes = new DBElementCollection(equipment.Owner,
+                new AndFilter(new TypeFilter(DbElementTypeInstance.TEXT),
+                  new AttributeStringFilter(DbAttributeInstance.PURP, FilterOperator.Equals, "STYP")));
+
+            var text = possbileStypes.First();
+            if (text.IsValid) {
+                Stype = text.GetAsString(DbAttributeInstance.STEX);
+            } else {
+                Stype = "AAAA";
+            }
+
+
+            var possbileTypes = new DBElementCollection(equipment.Owner,
+                new AndFilter(new TypeFilter(DbElementTypeInstance.TEXT),
+                  new AttributeStringFilter(DbAttributeInstance.PURP, FilterOperator.Equals, "TYPE")));
+
+            text = possbileTypes.First();
+            if (text.IsValid) {
+                FirstSeleTans = text.GetAsString(DbAttributeInstance.STEX);
+            } else {
+                FirstSeleTans = "VALV";
+            }
             
+
             DBElementCollection ptcas = new DBElementCollection(Scom.Owner, new TypeFilter(DbElementTypeInstance.PTCAR));
             foreach (DbElement ptca in ptcas) {
                 if (ptca.GetAsString(DbAttributeInstance.NUMB) == "1") {
@@ -88,13 +102,7 @@ namespace modelcatalogue.Create
                 }
             }
 
-            //TODO: replace function
-            var purp = _equipment.Owner.GetString(DbAttributeInstance.PURP);
-            if (purp.Length < 4) {
-                FirstSeleTans = "VALV";
-            } else {
-                FirstSeleTans = purp ;
-            }
+
         }
 
         

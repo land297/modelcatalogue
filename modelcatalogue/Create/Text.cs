@@ -11,12 +11,13 @@ namespace modelcatalogue.Create
     public class Text
     {
         private DbElement SDTE(DbElement cate, string detailText, string skey) {
-            DbElement sdte = cate.Members().SingleOrDefault(m => m.ElementType == DbElementTypeInstance.SDTEXT);
+            DbElement sdte = cate.Members().FirstOrDefault(m => m.ElementType == DbElementTypeInstance.SDTEXT);
             if (sdte == null || sdte.IsValid == false) {
                 sdte = cate.CreateLast(DbElementTypeInstance.SDTEXT);
             }
+            detailText = detailText.Replace("@SIZE", "' + STRING (PARA[1] ) + '");
             PMLCommander.RunPMLCommand(sdte, "SKEY", $"'{skey}'", out var error);
-            PMLCommander.RunPMLCommand(sdte, "RTEXT", $"'{detailText}'", out error);
+            PMLCommander.RunPMLCommandInParentheses(sdte, "RTEXT", $"'{detailText}'", out error);
             return sdte;
         }
 

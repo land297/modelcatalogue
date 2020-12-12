@@ -21,7 +21,7 @@ namespace modelcatalogue.Create
             DbElement scom = DbElement.GetElement();
 
             if (DoesScomExsist(equi.Name(), ref scom)) {
-                Cate.Update(equi, scom);
+                Cate.Update(scom,equi);
             } else {
                 scom = Cate.CreateEmptyScom(Cata, equi);
             }
@@ -38,16 +38,24 @@ namespace modelcatalogue.Create
             // need to save first
             // and then loop through all others, and see if they do not match, and update to new
             // parameter and stuff..
+            // foreach nozzleconfig
             var builableWithnozzleConfig = buildables.FirstOrDefault(b => b.NozzleConfig != null);
-            if (builableWithnozzleConfig != null) {
+            if (builableWithnozzleConfig != null ) {
                 DbElement dataset = DbElement.GetElement();
                 scom.GetValidRef(DbAttributeInstance.DTRE, ref dataset);
-                //dataset.CopyHierarchyPhase1(builableWithnozzleConfig.NozzleConfig.Dataset, new DbCopyOption());
-                //dataset.Copy(builableWithnozzleConfig.NozzleConfig.Dataset);
-                dataset.CopyHierarchy(builableWithnozzleConfig.NozzleConfig.Dataset, new DbCopyOption());
-                scom.SetAttribute(DbAttributeInstance.PARA, builableWithnozzleConfig.NozzleConfig.Parameters);
-                
 
+                if (builableWithnozzleConfig.NozzleConfig.Dataset != null && builableWithnozzleConfig.NozzleConfig.Dataset.IsValid) {
+                    dataset.CopyHierarchy(builableWithnozzleConfig.NozzleConfig.Dataset, new DbCopyOption());
+                }
+                scom.SetAttribute(DbAttributeInstance.PARA, builableWithnozzleConfig.NozzleConfig.Parameters);
+               
+                if (builableWithnozzleConfig.NozzleConfig.Coco.Substring(0, 1) == "F") {
+                    scom.SetAttribute(DbAttributeInstance.BLRF, builableWithnozzleConfig.NozzleConfig.Blrfarray);
+                } else {
+                    scom.SetAttributeDefault(DbAttributeInstance.BLRF);
+                }
+
+            } else {
 
             }
 

@@ -22,6 +22,19 @@ namespace modelcatalogue
             
         }
 
+        public static DbElement OwnerInHierarchyOfType(this DbElement element, DbElementType type) {
+            while(true) {
+                var owner = element.Owner;
+                if (owner.ElementType == type) {
+                    return owner;
+                }
+                if (owner.IsNull) {
+                    return owner;
+                }
+                element = owner;
+            }
+        }
+
         public static string Clean(this string s) {
             s = s.Replace("(","");
             s = s.Replace(")", "");

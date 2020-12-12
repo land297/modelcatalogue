@@ -17,7 +17,10 @@ namespace modelcatalogue.ConvertToBuildable
 
             size.Height = element.GetDouble(DbAttributeInstance.HEIG);
 
-            var pos = element.GetPosition(DbAttributeInstance.POS);
+            var q = new DbQualifier();
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
+
+            var pos = element.GetPosition(DbAttributeInstance.POS,q);
             position.X = pos.X;
             position.Y = pos.Y;
             position.Z = pos.Z;

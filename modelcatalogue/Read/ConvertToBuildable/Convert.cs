@@ -18,6 +18,7 @@ namespace modelcatalogue.ConvertToBuildable
             AddToConverters(new Dish());
             AddToConverters(new Nozz());
             AddToConverters(new Ctor());
+            AddToConverters(new Pyra());
         }
 
         private void AddToConverters(IBuildableConverter converter) {

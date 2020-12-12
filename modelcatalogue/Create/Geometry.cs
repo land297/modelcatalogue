@@ -22,9 +22,11 @@ namespace modelcatalogue.Create
             _ptse = scom.GetElement(DbAttributeInstance.PTRE);
             _scom = scom;
 
+            var lpyr = new Lpyr(PTCA,_gmse);
+            var sext = new Sext(PTCA, _gmse);
             //TODO: add reflection
-            _createMapping.Add(DbElementTypeInstance.SEXTRUSION, SEXT);
-            _createMapping.Add(DbElementTypeInstance.LPYRAMID, LPYR);
+            _createMapping.Add(DbElementTypeInstance.SEXTRUSION, sext.SEXT);
+            _createMapping.Add(DbElementTypeInstance.LPYRAMID, lpyr.LPYR);
             _createMapping.Add(DbElementTypeInstance.SDSH, SDSH);
             _createMapping.Add(DbElementTypeInstance.SCYLINDER, SCYL);
             _createMapping.Add(DbElementTypeInstance.LSNOUT, LSNO);
@@ -42,57 +44,8 @@ namespace modelcatalogue.Create
             }
         }
 
-        public void SEXT(Buildable element) {
-            var ptcaX = PTCA(element.Direction.X, element.Position);
-            var ptcaY = PTCA(element.Direction.Y, element.Position);
-            //var ptcaZ = PTCA(element.Direction.Z, element.Position);
 
-            var geom = _gmse.Create(1, DbElementTypeInstance.SEXTRUSION);
-
-            geom.SetAttribute(DbAttributeInstance.TUFL, true);
-            var error = string.Empty;
-
-            PMLCommander.RunPMLCommand(geom, "PAAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(geom, "PBAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(geom, "PHEI", element.Size.Height.ToString(), out error);
-
-            // no need to set position, as position is set by PAAX and PBAX
-            //PMLCommander.RunPMLCommandInParentheses(geom, "PX", element.Position.X.ToString(), out error);
-            //PMLCommander.RunPMLCommandInParentheses(geom, "PY", element.Position.Y.ToString(), out error);
-            //PMLCommander.RunPMLCommandInParentheses(geom, "PZ", element.Position.Z.ToString(), out error);
-
-            var sloo = geom.Create(1, DbElementTypeInstance.SLOOP);
-
-            foreach (var vert in element.Verticies) {
-                var svert = sloo.CreateLast(DbElementTypeInstance.SVERTEX);
-                PMLCommander.RunPMLCommandInParentheses(svert, "PX", vert.X.ToString(), out error);
-                PMLCommander.RunPMLCommandInParentheses(svert, "PY", vert.Y.ToString(), out error);
-            }
-
-        }
-        public void LPYR(Buildable element) {
-            Direction direction = element.Direction;
-            Position position = element.Position;
-            Size size = element.Size;
-            var ptcaX = PTCA(direction.X, position);
-            var ptcaY = PTCA(direction.Y, position);
-            var ptcaZ = PTCA(direction.Z, position);
-            var lpyr = _gmse.Create(1, DbElementTypeInstance.LPYRAMID);
-
-            lpyr.SetAttribute(DbAttributeInstance.TUFL, true);
-            var error = string.Empty;
-            PMLCommander.RunPMLCommand(lpyr, "PBTP", size.XLength.ToString(), out error);
-            PMLCommander.RunPMLCommand(lpyr, "PCTP", size.YLength.ToString(), out error);
-            PMLCommander.RunPMLCommand(lpyr, "PBBT", size.XLength.ToString(), out error);
-            PMLCommander.RunPMLCommand(lpyr, "PCBT", size.YLength.ToString(), out error);
-            PMLCommander.RunPMLCommand(lpyr, "PTDI", size.ZLength.ToString(), out error);
-
-
-            PMLCommander.RunPMLCommand(lpyr, "PBAX", $"P{ptcaX.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(lpyr, "PCAX", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(lpyr, "PAAX", $"P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
-        }
+        
         public void SDSH(Buildable element) {
             Direction direction = element.Direction;
             Position position = element.Position;
@@ -168,8 +121,7 @@ namespace modelcatalogue.Create
         private int[] _validNozzlePpoints = new int[6] { 1, 2, 4, 5, 6, 7};
         private List<int> _usedNozzlePpoints = new List<int>();
         public void PPointForNozzle(Buildable element) {
-            _scom.SetAttribute(DbAttributeInstance.BLRF, element.NozzleConfig.Blrfarray);
-
+        
             //TODO: handle p3 for direction
             if (!_usedNozzlePpoints.Contains(3)) {
                 var p = new Position();

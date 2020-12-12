@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\..\..\Program Files %28x86%29\AVEVA\Everything3D2.10\</OutputPath>
+    <OutputPath>c:\temp</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,27 +33,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.Core.Database">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Database.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\Aveva.Core.Database.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Database.Filters, Version=1.2.0.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Database.Filters.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\Aveva.Core.Database.Filters.dll</HintPath>
     </Reference>
     <Reference Include="Aveva.Core.DataManagement">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.DataManagement.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\Aveva.Core.DataManagement.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Geometry">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Geometry.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\Aveva.Core.Geometry.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Utilities">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\Aveva.Core.Utilities.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\Aveva.Core.Utilities.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PMLNet">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\AVEVA\Everything3D2.10\PMLNet.dll</HintPath>
+      <HintPath>G:\Everything3D2.10\PMLNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -66,6 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeInstance.cs" />
+    <Compile Include="Create\Lpyr.cs" />
+    <Compile Include="Create\Sext.cs" />
+    <Compile Include="PMLCommander.cs" />
+    <Compile Include="Read\ConvertToBuildable\Pyra.cs" />
     <Compile Include="Read\ConvertToBuildable\Box.cs" />
     <Compile Include="Read\ConvertToBuildable\Cyli.cs" />
     <Compile Include="Read\ConvertToBuildable\Nozz.cs" />
@@ -78,26 +82,18 @@
     <Compile Include="Create\Builder.cs" />
     <Compile Include="Create\Cata.cs" />
     <Compile Include="Create\Cate.cs" />
-    <Compile Include="Create\CateModifier.cs" />
     <Compile Include="Create\Geometry.cs" />
-    <Compile Include="Create\ICreator.cs" />
     <Compile Include="Create\SpecManager.cs" />
-    <Compile Include="Create\SpcoFull.cs" />
-    <Compile Include="Create\Test1.cs" />
+    <Compile Include="Create\SpcoRepresentation.cs" />
     <Compile Include="Create\Text.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Buildable.cs" />
     <Compile Include="ffscc.cs" />
-    <Compile Include="Create\Factory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Read\IReader.cs" />
-    <Compile Include="Read\Read.cs" />
-    <Compile Include="Read\Hierarchy.cs" />
     <Compile Include="Read\Reader.cs" />
     <Compile Include="DimensionalStructs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Create\oldPTSECode.txt" />
     <Content Include="notes.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

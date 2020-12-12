@@ -7,6 +7,12 @@ namespace modelcatalogue {
 
     public struct Size {
         public double XLength, YLength, ZLength, Diameter, Height, TopDiameter, BotDiameter;
+        internal double XBottom;
+        internal double YBottom;
+        internal double XTop;
+        internal double YTop;
+        internal double XOffset;
+        internal double YOffset;
     }
 
     public struct Position {

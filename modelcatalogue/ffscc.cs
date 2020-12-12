@@ -37,9 +37,13 @@ namespace modelcatalogue
         [PMLNetCallable()]
         public void Assign(ffscc that) {
         }
+        [PMLNetCallable()]
+        public string GetVersion() {
+            return "0.1";
+        }
 
         [PMLNetCallable()]
-        public void Include(string equipmentName, string specNaem, string specTypeAnswer, string skey) {
+        public void Include(string equipmentName, string specNaem) {
             try {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
                 var builder = new Builder();
@@ -52,23 +56,18 @@ namespace modelcatalogue
                 builder.Reader.Converter = new ConvertToBuildable.Convert();
 
                 var scom = builder.BuildScom(equi);
-
-                var spcoInfo = new Create.SpcoRepresentation(scom, equi, specTypeAnswer, skey);
+                var session = builder.Reader.GetLastSessionModified(equi);
+                Console.WriteLine($" sessionmod : {session}");
+                var spcoInfo = new Create.SpcoRepresentation(scom, equi);
                 spcoInfo.DefineMatxt(builder.Cata);
 
                 var specManager = new Create.SpecManager(spec, spcoInfo.FirstSeleTans);
                 specManager.AddSpco(spcoInfo);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.Source);
             }
-
-        }
-
-        [PMLNetCallable()]
-        public void Include(string equipmentName, string specNaem) {
-            Include(equipmentName, specNaem, string.Empty, string.Empty);
         }
 
         //[PMLNetCallable()]

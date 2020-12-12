@@ -25,6 +25,7 @@ namespace modelcatalogue.ConvertToBuildable
 
             var q = new DbQualifier();
             q.Add(2);
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
             var pos = element.GetPosition(DbAttributeInstance.PPOS, q);
 
             position.X = pos.X;
@@ -38,7 +39,7 @@ namespace modelcatalogue.ConvertToBuildable
             direction.Z = dir.ToString();
 
  
-            return new Buildable(DbElementTypeInstance.SDSH, element, size, position, direction);
+            return new Buildable(DbElementTypeInstance.SDSH, element, size, position, direction, element.ElementType);
 
         }
     

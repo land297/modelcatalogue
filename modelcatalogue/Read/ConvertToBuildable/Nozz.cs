@@ -16,9 +16,17 @@ namespace modelcatalogue.ConvertToBuildable
 
             var q = new DbQualifier();
             q.Add(1);
+            q.wrtQualifier = element.OwnerInHierarchyOfType(DbElementTypeInstance.EQUIPMENT);
+
             var nozzleConfig = new NozzleConfig();
             size.Diameter = element.GetDouble(DbAttributeInstance.PPBO, q);
-            nozzleConfig.Coco = element.GetString(DbAttributeInstance.PPCO, q);
+            var description = element.GetString(DbAttributeInstance.DESC);
+            if (string.IsNullOrWhiteSpace(description)) {
+                nozzleConfig.Coco = element.GetString(DbAttributeInstance.PPCO, q);
+            } else {
+                nozzleConfig.Coco = description;
+            }
+            
             var pos = element.GetPosition(DbAttributeInstance.PPOS, q);
 
             position.X = pos.X;
@@ -29,6 +37,8 @@ namespace modelcatalogue.ConvertToBuildable
             direction.X = d.ToString();
             direction.Y = d.ToString();
             direction.Z = d.ToString();
+
+            //TODO: handle multiple BLRFARRAYS
 
             var catref = DbElement.GetElement();
             if (element.GetValidRef(DbAttributeInstance.CATR, ref catref)) {
