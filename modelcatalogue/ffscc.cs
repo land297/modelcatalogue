@@ -39,7 +39,7 @@ namespace modelcatalogue
         }
         [PMLNetCallable()]
         public string GetVersion() {
-            return "0.1";
+            return "0.2";
         }
 
         [PMLNetCallable()]
@@ -58,7 +58,7 @@ namespace modelcatalogue
                 var scom = builder.BuildScom(equi);
                 var session = builder.Reader.GetLastSessionModified(equi);
                 Console.WriteLine($" sessionmod : {session}");
-                var spcoInfo = new Create.SpcoRepresentation(scom, equi);
+                var spcoInfo = new Create.SpcoRepresentation(scom, equi, builder.Text);
                 spcoInfo.DefineMatxt(builder.Cata);
 
                 var specManager = new Create.SpecManager(spec, spcoInfo.FirstSeleTans);

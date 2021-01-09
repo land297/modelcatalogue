@@ -31,7 +31,6 @@ namespace modelcatalogue.Create
         public string Skey { get; private set; }
         public string Name { get { return Scom.Name().Replace(".SCOM", string.Empty) + ".SPCO"; } }
 
-
         public void DefineMatxt(DbElement cata) {
             DbElement sect = cata.Members().SingleOrDefault(s => s.GetString(DbAttributeInstance.DESC) == "MaterialContainer");
             if (sect == null || sect.IsValid == false) {
@@ -49,39 +48,14 @@ namespace modelcatalogue.Create
             Smte = smte;
         }
 
-        public SpcoRepresentation(DbElement scom, DbElement equipment) {
+        public SpcoRepresentation(DbElement scom, DbElement equipment, Text text) {
             Scom = scom;
             _equipment = equipment;
-            Sdte = scom.Owner.Members().Single(m => m.ElementType == DbElementTypeInstance.SDTEXT);
-
-            var possbileMatxts = new DBElementCollection(equipment.Owner,
-                new AndFilter(new TypeFilter(DbElementTypeInstance.TEXT),
-                              new AttributeStringFilter(DbAttributeInstance.PURP, FilterOperator.Equals, "MTXT")));
             
-            MatxtTextElement = possbileMatxts.First();
-            
-            var possbileStypes = new DBElementCollection(equipment.Owner,
-                new AndFilter(new TypeFilter(DbElementTypeInstance.TEXT),
-                  new AttributeStringFilter(DbAttributeInstance.PURP, FilterOperator.Equals, "STYP")));
-
-            var text = possbileStypes.First();
-            if (text.IsValid) {
-                Stype = text.GetAsString(DbAttributeInstance.STEX);
-            } else {
-                Stype = "AAAA";
-            }
-
-
-            var possbileTypes = new DBElementCollection(equipment.Owner,
-                new AndFilter(new TypeFilter(DbElementTypeInstance.TEXT),
-                  new AttributeStringFilter(DbAttributeInstance.PURP, FilterOperator.Equals, "TYPE")));
-
-            text = possbileTypes.First();
-            if (text.IsValid) {
-                FirstSeleTans = text.GetAsString(DbAttributeInstance.STEX);
-            } else {
-                FirstSeleTans = "VALV";
-            }
+            Sdte = text.Sdte;
+            MatxtTextElement = text.MatxtElement(equipment);
+            Stype = text.Stype(equipment);
+            FirstSeleTans = text.TypeTans(equipment);
             
 
             DBElementCollection ptcas = new DBElementCollection(Scom.Owner, new TypeFilter(DbElementTypeInstance.PTCAR));

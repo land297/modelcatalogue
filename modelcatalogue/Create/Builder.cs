@@ -12,6 +12,7 @@ namespace modelcatalogue.Create
         public DbElement Cata { get; set; }
         public Cate Cate { get; set; }
         public Reader Reader { get; set; }
+        public Text Text { get; private set; }
 
         internal void SetCata(DbElement cata) {
             Cata = cata;
@@ -31,8 +32,8 @@ namespace modelcatalogue.Create
 
             geometry.AddGeometry(buildables);
 
-            var text = new Text();
-            text.CreateOrUpdateSDTE(equi, Cate.Element);
+            Text = new Text();
+            Text.CreateOrUpdateSDTE(equi, Cate.Element);
 
 
             // need to save first
