@@ -28,7 +28,7 @@ namespace modelcatalogue.ConvertToBuildable
             position.Y = pos.Y;
             position.Z = pos.Z;
 
-            var orientation = element.GetOrientation(DbAttributeInstance.ORI);
+            var orientation = element.GetOrientation(DbAttributeInstance.ORI,q);
             direction.X = orientation.XDir().ToString();
             direction.Y = orientation.YDir().ToString();
             direction.Z = orientation.ZDir().ToString();

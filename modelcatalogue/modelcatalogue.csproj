@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>G:\Everything3D2.10\</OutputPath>
+    <OutputPath>D:\Everything3D2.10\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,27 +33,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.Core.Database">
-      <HintPath>G:\Everything3D2.10\Aveva.Core.Database.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\Aveva.Core.Database.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Database.Filters, Version=1.2.0.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>G:\Everything3D2.10\Aveva.Core.Database.Filters.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\Aveva.Core.Database.Filters.dll</HintPath>
     </Reference>
     <Reference Include="Aveva.Core.DataManagement">
-      <HintPath>G:\Everything3D2.10\Aveva.Core.DataManagement.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\Aveva.Core.DataManagement.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Geometry">
-      <HintPath>G:\Everything3D2.10\Aveva.Core.Geometry.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\Aveva.Core.Geometry.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.Core.Utilities">
-      <HintPath>G:\Everything3D2.10\Aveva.Core.Utilities.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\Aveva.Core.Utilities.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PMLNet">
-      <HintPath>G:\Everything3D2.10\PMLNet.dll</HintPath>
+      <HintPath>D:\Everything3D2.10\\PMLNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="AttributeInstance.cs" />
     <Compile Include="Create\Lpyr.cs" />
+    <Compile Include="Create\Lsno.cs" />
     <Compile Include="Create\Sext.cs" />
     <Compile Include="PMLCommander.cs" />
     <Compile Include="Read\ConvertToBuildable\Pyra.cs" />

@@ -69,31 +69,41 @@ namespace modelcatalogue.Create
         }
 
         public void AddSpco(SpcoRepresentation spcoRepre) {
+            // TODO: implement better SPCO naming strategy
             Console.WriteLine("SpecManager.AddSpco");
 
             if (spcoRepre.Stype == string.Empty || spcoRepre.PBore1 == 0) {
-                Console.WriteLine($"Invalid input for:{spcoRepre.Sdte.GetString(DbAttributeInstance.DTXR)}");
-                Console.WriteLine($"Stype: {spcoRepre.Stype}");
-                Console.WriteLine($"Bore: {spcoRepre.PBore1}");
+                Console.WriteLine($"## Invalid input for:{spcoRepre.Sdte.GetString(DbAttributeInstance.DTXR)}");
+                Console.WriteLine($"Stype cannot be empty and is: {spcoRepre.Stype}");
+                Console.WriteLine($"Bore cannot be 0 and is : {spcoRepre.PBore1}");
                 return;
             }
+            var spcoName = Spec.Name() + spcoRepre.Name;
+            if (spcoName.Length>50) {
+                spcoName = Spec.Name() + spcoRepre.Name.Substring(Spec.Name().Length);
+            }
             DBElementCollection spcos = new DBElementCollection(Spec, new AttributeRefFilter(DbAttributeInstance.CATR, spcoRepre.Scom));
-            DbElement spco = default(DbElement);
+            DbElement spco;
             if (spcos.Count() > 0) {
                 spco = spcos.First();
-                spco.SetAttribute(DbAttributeInstance.NAME, Spec.Name() + spcoRepre.Name);
+                
             } else {
                 spco = BoreSele(spcoRepre.PBore1).CreateLast(DbElementTypeInstance.SPCOMPONENT);
-                spco.SetAttribute(DbAttributeInstance.NAME, Spec.Name() + spcoRepre.Name);
+            }
+
+            // TODO: do something much better. with the spco name. maybe stype + size + dtxr???
+            try {
+                spco.SetAttribute(DbAttributeInstance.NAME, spcoName);
+            } catch {
+                for (int i = 0; i < 100; i++) {
+                    try {
+                        spco.SetAttribute(DbAttributeInstance.NAME, spcoName + i.ToString());
+                    } catch { }
+                }
             }
             spco.SetAttribute(DbAttributeInstance.TANS, spcoRepre.Stype);
             spco.SetAttribute(DbAttributeInstance.CATR, spcoRepre.Scom);
 
-            //somehow cannot set detr via setAttribute...
-            //var commandString = $"DETR {spcoRepre.Sdte.FullName()}";
-            //CurrentElement.Element = spco;
-            //var pmlCommand = Command.CreateCommand(commandString);
-            //pmlCommand.RunInPdms();
             PMLCommander.RunPMLCommand(spco, "DETR", spcoRepre.Sdte.FullName(), out string error);
             PMLCommander.RunPMLCommand(spco, "MATXT", spcoRepre.Smte.FullName(), out   error);
 

@@ -24,12 +24,13 @@ namespace modelcatalogue.Create
 
             var lpyr = new Lpyr(PTCA,_gmse);
             var sext = new Sext(PTCA, _gmse);
+            var lsno = new Lsno(PTCA, _gmse);
             //TODO: add reflection
             _createMapping.Add(DbElementTypeInstance.SEXTRUSION, sext.SEXT);
             _createMapping.Add(DbElementTypeInstance.LPYRAMID, lpyr.LPYR);
             _createMapping.Add(DbElementTypeInstance.SDSH, SDSH);
             _createMapping.Add(DbElementTypeInstance.SCYLINDER, SCYL);
-            _createMapping.Add(DbElementTypeInstance.LSNOUT, LSNO);
+            _createMapping.Add(DbElementTypeInstance.LSNOUT, lsno.LSNO);
             _createMapping.Add(DbElementTypeInstance.NOZZLE, PPointForNozzle);
             _createMapping.Add(DbElementTypeInstance.SCTORUS, SCTO);
 
@@ -95,27 +96,6 @@ namespace modelcatalogue.Create
             PMLCommander.RunPMLCommand(geom, "PDIA", size.Diameter.ToString(), out error);
             PMLCommander.RunPMLCommand(geom, "PHEI", size.Height.ToString(), out error);
             PMLCommander.RunPMLCommand(geom, "PAXIS", $"-P{ptca.GetAsString(DbAttributeInstance.NUMB)}", out error);
-        }
-        public void LSNO(Buildable element) {
-            Direction direction = element.Direction;
-            Position position = element.Position;
-            Size size = element.Size;
-            var ptcaY = PTCA(direction.Y, position);
-            var ptcaZ = PTCA(direction.Z, position);
-            var geom = _gmse.Create(1, DbElementTypeInstance.LSNOUT);
-
-            geom.SetAttribute(DbAttributeInstance.TUFL, true);
-            geom.SetAttribute(DbAttributeInstance.CLFL, false);
-
-            PMLCommander.RunPMLCommand(geom, "PTDI", size.Height.ToString(), out var error);
-            //invert top and bot in paragon...
-            PMLCommander.RunPMLCommand(geom, "PTDM", size.BotDiameter.ToString(), out error);
-            PMLCommander.RunPMLCommand(geom, "PBDM", size.TopDiameter.ToString(), out error);
-            PMLCommander.RunPMLCommand(geom, "POFF", "0", out error);
-
-
-            PMLCommander.RunPMLCommand(geom, "PAAXIS", $"-P{ptcaZ.GetAsString(DbAttributeInstance.NUMB)}", out error);
-            PMLCommander.RunPMLCommand(geom, "PBAXIS", $"P{ptcaY.GetAsString(DbAttributeInstance.NUMB)}", out error);
         }
         private int _nozzlePpointIndex = 0;
         private int[] _validNozzlePpoints = new int[6] { 1, 2, 4, 5, 6, 7};

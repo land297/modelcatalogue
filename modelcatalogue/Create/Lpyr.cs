@@ -23,7 +23,7 @@ namespace modelcatalogue.Create {
             var lpyr = _gmse.Create(1, DbElementTypeInstance.LPYRAMID);
 
             lpyr.SetAttribute(DbAttributeInstance.TUFL, true);
-            var error = string.Empty;
+            string error;
             if (element.SourceType == DbElementTypeInstance.PYRAMID) {
                 PMLCommander.RunPMLCommandInParentheses(lpyr, "PBTP", size.XTop.ToString("0.##"), out error);
                 PMLCommander.RunPMLCommandInParentheses(lpyr, "PCTP", size.YTop.ToString("0.##"), out error);
