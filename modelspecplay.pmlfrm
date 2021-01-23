@@ -35,7 +35,12 @@ setup form !!modelspecplay resize
 				paragraph .paraDetailTextSize at xmax + 0.5 ymin text |Use @SIZE to represent actual size in text|
 				text .textMaterial  tagwid 8 'Material'  at xmin.textDetailText ymax.textDetailText + 0.5 width 15 is string
 				text .textSkey  tagwid 8 'Skey'  at xmin ymax + 0.5 width 5 is string
-				button .buSetSkeyFromModel 'Set from model' tooltip 'Will set a defaul SKEY based on nozzle connection' at xmax + 0.5 ymin call '!this.SetSkeyFromModel()'
+				--button .buSetSkeyFromModel 'Set from model' tooltip 'Will set a defaul SKEY based on nozzle connection' at xmax + 0.5 ymin call '!this.SetSkeyFromModel()'
+				button .butSetSkeyBW 'Welded' tooltip 'Set BW connection' at xmax + 0.3 ymin call '!this.SetSkeyTo(|BW|)'
+				button .butSetSkeyCP 'Wafer' tooltip 'Set BW connection' at xmax + 0.3 ymin call '!this.SetSkeyTo(|CP|)'
+				button .butSetSkeyFL 'Flanged' tooltip 'Set BW connection' at xmax + 0.3 ymin call '!this.SetSkeyTo(|FL|)'
+				button .butSetSkeySW 'Socket Weld' tooltip 'Set BW connection' at xmax + 0.3 ymin call '!this.SetSkeyTo(|SW|)'
+				
 				text .textStype  tagwid 8 'Stype'  at xmin.textSkey ymax.textSkey + 0.5 width 5 is string
 				text .textType  tagwid 8 'Type'  at xmin ymax + 0.5 width 5 is string
 				paragraph .paraType at xmax + 0.5 ymin text 'Read only field'
@@ -62,6 +67,8 @@ setup form !!modelspecplay resize
 	menu .menuValveTypes popup
 		!this.menuValveTypes.add( 'callback', 'Select', '!this.Select()' )
 		
+	menu .menuValveInSpec popup
+		!this.menuValveInSpec.add( 'callback', 'Remove', '!this.RemoveFromSpec()' )
 		
 	menu .menuValveSizes popup
 		!this.menuValveSizes.add( 'callback', 'Add + Select', '!this.AddSelect()' )
@@ -112,6 +119,7 @@ define method .modelspecplay()
 	!this.ValvesInWritableSpec.columnExcelFilter(false)
 	!this.ValvesInWritableSpec.bulkEditableGrid(false)
 	!this.ValvesInWritableSpec.outlookGroupStyle(false)
+	!this.ValvesInWritableSpec.addeventhandler('OnPopup', !this, 'valveInSpecsOnPopup')
 	
 	!this.DetailsGrid= object NetGridControl() 
 	!this.conDetailsGrid.control = !this.DetailsGrid.handle()
@@ -128,7 +136,7 @@ define method .modelspecplay()
 	!test = object ffscc()
 	!dllVersion =  !test.getversion()
 	!pmlVersion = '0.1'
-	!this.formTitle = 'modelspecplay - [verions: (' + !pmlVersion + ') (' + !dllVersion + ')]'
+	!this.formTitle = 'ModelSpec - [verions: (' + !pmlVersion + ') (' + !dllVersion + ')]'
 	!this.cancelcall  = '!this.closecall()'
 	
 	!this.Refresh()
@@ -138,7 +146,7 @@ define method .modelspecplay()
 		
 	else
 		!this.buIncludeInSpec.visible = false
-		!this.aidNumber = !!aidNumbers.add('modelspecplay')
+		!this.aidNumber = !!aidNumbers.add('modelspec')
 	endif
 	
 	!this.textType.editable = false
@@ -251,6 +259,11 @@ define method .valveSizesOnPopup(!data is ARRAY)
   !this.conValveSizesGrid.showPopup(!data[0], !data[1])
 endmethod
 
+define method .valveInSpecsOnPopup(!data is ARRAY)
+  !this.conValvesInWritableSpec.popup = !this.menuValveInSpec
+  !this.conValvesInWritableSpec.showPopup(!data[0], !data[1])
+endmethod
+
 define method .select() 
 	!valveType = !this.ValveTypesGrid.GetSelectedRows()[1][1]
 	$!valveType
@@ -261,6 +274,45 @@ define method .AddSelect()
 	ADD $!valveType
 	$!valveType
 endmethod
+
+define method .RemoveFromSpec()
+	!refno = !this.ValvesInWritableSpec.GetSelectedRows()[1][6]
+	var !dbname dbname of $!refno
+	!limbos = !!CollectAllFor('SPEC','QUEST EQ |LIMB| AND DBNAME EQ |$!dbname|',WORLD)
+	
+	if !limbos.size() eq 0 then
+		!!Alert.Error('No *LIMBOSPEC found')
+		return
+	endif
+	
+	$!refno
+	!delete = !!ce
+	END
+	!possibleKeep = !!ce
+	do !i to 1000
+		if !possibleKeep.mcount gt 1 then
+			break
+		else
+			!delete = !possibleKeep
+			!possibleKeep = !possibleKeep.owner
+		endif
+	enddo
+	
+	$!limbos[1]
+	INCLUDE $!refno
+	$!refno
+	UNNAME
+	$!delete
+	if !!ce.type eq 'SPEC' then
+		1
+		DELETE SELE
+	elseif !!ce.type ne 'SPCO' then
+		DELETE SELE
+	endif
+	
+	!this.afterSelectChangeWritableSpecs(object array())
+endmethod
+
 define method .detailsOnPopup(!data is ARRAY)
   !this.conDetailsGrid.popup = !this.menuDetails
   !this.conDetailsGrid.showPopup(!data[0], !data[1])
@@ -363,6 +415,9 @@ define method .ExtractAndBindValeTypesSizesGrid(!zone is dbref)
 	do !e values !equis
 		-- TODO: check all not only first
 		!nozzle = !!CollectAllFor('NOZZ','',!e).first()
+		handle any
+			skip
+		endhandle
 		--!skey = !!CollectAllFor('TEXT','PURP EQ |SKEY|',!z).first()
 		
 		!row = object array()
@@ -412,6 +467,7 @@ define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
 	!headings.Append('Size')
 	!headings.Append('Bolting')
 	!headings.Append('GType')
+	!headings.Append('Refno')
 	--!headings.Append('skey')
 	
 	!rows = object array()
@@ -439,7 +495,7 @@ define method .ExtractAndBindValesInWritableSpecGrid(!spec is dbref)
 		endif
 		!row.append(!s.catref.gtype)
 
-		--!row.append(!skey.stext)
+		!row.append(!s.refno.string())
 		!rows.append(!row)
 	enddo
 	
@@ -684,6 +740,13 @@ define method .SetSkeyFromModel() is string
 		!this.textSkey.val = !skey
 	endif
 endmethod
+define method .SetSkeyTo(!skey is string)
+	if !this.textSkey.val.length() lt 4 then
+		!this.textSkey.val = 'VV' + !skey
+	else
+		!this.textSkey.val = !this.textSkey.val.substring(1,2) + !skey
+	endif
+endmethod
 define method .BindToDetailsGrid(!zone is dbref)
 	--!zone = !this.textCreateCe.val.dbref()
 	!nozzles = !!CollectAllFor('NOZZ','',!zone)
@@ -724,8 +787,7 @@ define method .NozzleNumberAsString(!nozzle is dbref) is string
 	else
 		return !nozzle.sequ.string()
 	endif
-
-
+endmethod
 --!this.aidNumber = !!aidNumbers.add('Ceiling grid, grid tags')
 --	Line 2097:     AID ARROW NUMBER $!<this.aidNumber> AT $!tagPosition DIRECTION $!<direction> HEIGHT 500mm PROPORTION 0.1
 --	Line 2111:       AID ARROW NUMBER $!<this.aidNumber> AT $!tagPosition DIRECTION $!direction HEIGHT 500mm
